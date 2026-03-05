@@ -129,8 +129,8 @@ const prviewImage = (index: number) => {
 
     .image-picker-box {
         box-sizing: border-box;
-        width: calc((100% - 20px) / 3);
-        aspect-ratio: 1 / 1;
+        width: 80px;
+        height: 80px;
         border: 1px solid #eee;
         background: #fff;
         border-radius: 3px;
@@ -162,6 +162,7 @@ const prviewImage = (index: number) => {
         display: flex;
         align-items: center;
         justify-content: center;
+        line-height: 1;
     }
 }
 

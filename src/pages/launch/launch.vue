@@ -22,7 +22,7 @@ onLoad(async () => {
     uni.hideLoading()
     uni.reLaunch({
         // url: "/pages/home/home"
-        url: "/pages/mine/mine"
+        url: "/pages/mbr/list"
     })
 })
 </script>

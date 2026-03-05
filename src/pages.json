@@ -17,11 +17,20 @@
     },
     {
       "path": "pages/mine/mine"
+    },
+    {
+      "path": "pages/mbr/form"
+    },
+    {
+      "path": "pages/mbr/list"
+    },
+    {
+      "path": "pages/mbr/detail"
     }
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "uniapp-pro",
+    "navigationBarTitleText": "叁生禧",
     "navigationBarBackgroundColor": "#F8F8F8",
     "backgroundColor": "#F8F8F8"
   },

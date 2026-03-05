@@ -8,7 +8,7 @@
   /* 5+App特有相关 */
   "app-plus": {
     "usingComponents": true,
-    "nvueStyleCompiler": "uni-app",
+    "nvueStyleCompiler": "叁生禧",
     "compilerVersion": 3,
     "splashscreen": {
       "alwaysShowBeforeRender": true,
@@ -50,7 +50,7 @@
   "quickapp": {},
   /* 小程序特有相关 */
   "mp-weixin": {
-    "appid": "wx2020e8020c2f8386",
+    "appid": "wx31ccfafb7c027857",
     "setting": {
       "urlCheck": false
     },
