@@ -28,8 +28,8 @@
                 <uni-forms-item label="职业" name="occupation">
                     <uni-easyinput type="text" v-model="formData.occupation" />
                 </uni-forms-item>
-                <uni-forms-item label="相册" name="album">
-                    <pro-upload v-model="formData.album" />
+                <uni-forms-item label="相册" name="albums">
+                    <pro-upload v-model="formData.albums" />
                 </uni-forms-item>
             </uni-card>
 
@@ -84,6 +84,7 @@ import { ref, watch } from 'vue';
 import { onReady } from '@dcloudio/uni-app';
 import useDict from '@/hooks/useDict';
 import { birthYearOptions, heightOptions, whetherOptions } from '@/utils/options';
+import { createMbrApi } from '@/api/mbr';
 
 const formRef = ref()
 const formData = ref({
@@ -95,7 +96,7 @@ const formData = ref({
     education: '',
     industry: '',
     occupation: '',
-    album: [],
+    albums: [],
 
     currentAddress: [],
     permanentAddress: [],
@@ -230,7 +231,12 @@ const { dict } = useDict(['gender', 'industry', 'marital_status', 'education', '
 
 const submitForm = () => {
     formRef.value.validate().then((res) => {
-        console.log(res)
+        createMbrApi({
+            ...res,
+            albumKeys: res.albums.map(i => i.key)
+        }).then(res => {
+            console.log('res', res)
+        })
     })
 }
 

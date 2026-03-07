@@ -3,19 +3,19 @@
         <view v-if="fileMediatype === 'image'" class="image-picker-container">
             <view class="image-picker-box" v-for="(item, index) in fileList" :key="item.key">
                 <image class="file-image" :src="item.path" mode="aspectFill" @tap.stop="prviewImage(index)" />
-                <view class="icon-del-box" @tap.stop="del(index, item.key)">
+                <view v-if="!disabled" class="icon-del-box" @tap.stop="del(index, item.key)">
                     <uni-icons type="closeempty" size="18" color="#fff" />
                 </view>
             </view>
-            <view class="image-picker-box is-add" @tap.stop="choose">
+            <view v-if="!disabled" class="image-picker-box is-add" @tap.stop="choose">
                 <uni-icons type="plusempty" size="64" color="#f1f1f1" />
             </view>
         </view>
         <view v-else class="file-picker-container">
-            <button type="primary" size="mini" @tap.stop="choose">选择文件</button>
+            <button v-if="!disabled" type="primary" size="mini" @tap.stop="choose">选择文件</button>
             <view class="file-picker-box" v-for="(item, index) in fileList" :key="item.key">
                 <view class="file-picker-name">{{ item.name }}</view>
-                <view class="icon-del-icon" @tap.stop="del(index, item.key)">
+                <view v-if="!disabled" class="icon-del-icon" @tap.stop="del(index, item.key)">
                     <uni-icons type="closeempty" size="18" color="#999" />
                 </view>
             </view>
@@ -39,11 +39,13 @@ const props = withDefaults(defineProps<{
     fileMediatype: 'image' | 'all'
     sourceType: ('album' | 'camera')[]
     sizeType: ('compressed' | 'original')[]
+    disabled: boolean
 }>(), {
     limit: 9,
     fileMediatype: 'image',
     sourceType: () => ['album', 'camera'],
     sizeType: () => ['compressed'],
+    disabled: false
 })
 
 

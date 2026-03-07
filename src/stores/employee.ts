@@ -1,23 +1,24 @@
 import {
   bindMobileApi,
   getAccessTokenApi,
-  getCurrentUserInfoApi,
+  getCurrentEmployeeInfoApi,
   unBindMobileApi,
-} from "@/api/user";
+} from "@/api/employee";
 import { UserLevel } from "@/utils/enums";
 
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
-interface UserInfo {
+interface EmployeeInfo {
   id: number;
   mobile: string;
+  nickname: string;
 }
 
-export const useUserStore = defineStore("user", () => {
+export const useEmployeeStore = defineStore("employee", () => {
   const token = ref<Nullable<string>>(null);
-  const userInfo = ref<Nullable<UserInfo>>(null);
-  const userLevel = ref<UserLevel>(UserLevel.Anonymous);
+  const employeeInfo = ref<Nullable<EmployeeInfo>>(null);
+  const employeeLevel = ref<UserLevel>(UserLevel.Anonymous);
 
   function getAccessToken() {
     return new Promise((resolve, reject) => {
@@ -29,7 +30,7 @@ export const useUserStore = defineStore("user", () => {
               code: res.code,
             }).then((res) => {
               token.value = res.token_info.access_token;
-              userLevel.value = res.level;
+              employeeLevel.value = res.level;
               resolve(res);
             });
           }
@@ -41,11 +42,12 @@ export const useUserStore = defineStore("user", () => {
     });
   }
 
-  async function getUserInfo() {
-    const res = await getCurrentUserInfoApi();
-    userInfo.value = {
+  async function getEmployeeInfo() {
+    const res = await getCurrentEmployeeInfoApi();
+    employeeInfo.value = {
       id: res.id,
       mobile: res.mobile,
+      nickname: res.nickname,
     };
     return res;
   }
@@ -55,21 +57,21 @@ export const useUserStore = defineStore("user", () => {
       code,
     });
     await getAccessToken();
-    await getUserInfo();
+    await getEmployeeInfo();
   }
 
   async function unBindMobile() {
     await unBindMobileApi();
     await getAccessToken();
-    userInfo.value = null;
+    employeeInfo.value = null;
   }
 
   return {
     token,
-    userInfo,
-    userLevel,
+    employeeInfo,
+    employeeLevel,
     getAccessToken,
-    getUserInfo,
+    getEmployeeInfo,
     bindMobile,
     unBindMobile,
   };

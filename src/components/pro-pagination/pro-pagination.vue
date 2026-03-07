@@ -1,16 +1,13 @@
 <template>
-    <uni-list>
-        <slot :data="data"></slot>
-    </uni-list>
-    <view class="load-more">
-        <uni-load-more :status="loadMoreStatus"></uni-load-more>
+    <slot :data="data"></slot>
+    <view class="pagination-wrapper">
+        <uni-pagination v-model="currentPage" :total="total" :page-size="pageSize" />
     </view>
 </template>
 
 <script setup lang="ts">
 import usePagination, { PaginationOptions } from '@/hooks/usePagination';
 import { Service } from '@/hooks/useRequest/type';
-import { computed } from 'vue';
 
 const props = withDefaults(defineProps<{
     request: Service<any, any>
@@ -19,30 +16,20 @@ const props = withDefaults(defineProps<{
     requestOptions: () => ({}),
 })
 
-const { data, loading, search, reset, isLastPage } =
+const { data, total, currentPage, pageSize, search, reset, refresh } =
     usePagination(props.request, props.requestOptions);
-
-
-const loadMoreStatus = computed(() => {
-    if (loading.value) {
-        return 'loading';
-    }
-    if (isLastPage.value) {
-        return 'nomore';
-    }
-    return 'more';
-})
 
 const _expose = {
     search,
     reset,
+    refresh
 };
 
 defineExpose(_expose);
 </script>
 
 <style lang="scss" scoped>
-.load-more {
-    padding: 8px 0;
+.pagination-wrapper {
+    padding: 12px;
 }
 </style>

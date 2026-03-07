@@ -1,8 +1,7 @@
 import useRequest from "./useRequest";
 import { merge, pick } from "lodash";
 import type { Options, Service } from "./useRequest/type";
-import { computed, onMounted, ref } from "vue";
-import { onReachBottom } from "@dcloudio/uni-app";
+import { computed } from "vue";
 
 interface PaginationType {
   pageKey: string;
@@ -18,26 +17,27 @@ export interface PaginationExtendsOption {
 export interface PaginationOptions<R = any, P extends unknown[] = any>
   extends Options<R, P>, PaginationExtendsOption {}
 
+const defaultPaginationOptions: PaginationType = {
+  // reuqest keys
+  pageKey: "page",
+  pageSizeKey: "list_rows",
+  // response keys
+  totalKey: "total",
+  dataKey: "data",
+};
+
+export const getPaginationOptions = (pagination?: Partial<PaginationType>) => {
+  return Object.assign({}, defaultPaginationOptions, pagination);
+};
+
 function usePagination<R = any, P extends unknown[] = any>(
   service: Service<R, P>,
   options: PaginationOptions<R, P> = {},
 ) {
   const { pagination, ...restOptions } = options;
 
-  const defaultPaginationOptions: PaginationType = {
-    // reuqest keys
-    pageKey: "page",
-    pageSizeKey: "list_rows",
-    // response keys
-    totalKey: "total",
-    dataKey: "data",
-  };
-
-  const { pageKey, pageSizeKey, totalKey, dataKey } = Object.assign(
-    {},
-    defaultPaginationOptions,
-    pagination,
-  );
+  const { pageKey, pageSizeKey, totalKey, dataKey } =
+    getPaginationOptions(pagination);
 
   const finallyOptions = merge(
     {
@@ -55,38 +55,15 @@ function usePagination<R = any, P extends unknown[] = any>(
     finallyOptions.defaultParams![0] as Record<string, any>,
   );
 
-  const isLastPage = ref(false);
-
   const {
     data: responseData,
     loading,
     params,
     run,
     refresh,
-  } = useRequest<R, P>(
-    service,
-    {
-      ...finallyOptions,
-      manual: true,
-      onBefore: (args) => {
-        isLastPage.value = false;
-        const reqPage = args[0]?.[pageKey];
-        if (reqPage === 1) {
-          data.value = [];
-        }
-      },
-      onSuccess: (res, args) => {
-        const reqPage = args[0]?.[pageKey];
-        const reqPageSize = args[0]?.[pageSizeKey];
-        const resData = res?.[dataKey];
-        reqPage === 1 ? (data.value = resData) : data.value.push(...resData);
-        isLastPage.value = reqPageSize * reqPage >= res?.[totalKey];
-      },
-    },
-    {
-      params: finallyOptions.defaultParams,
-    },
-  );
+  } = useRequest<R, P>(service, finallyOptions, {
+    params: finallyOptions.defaultParams,
+  });
 
   const paging = (
     paginationParams?: Record<string, any>,
@@ -107,9 +84,7 @@ function usePagination<R = any, P extends unknown[] = any>(
     }
 
     const mergerParams = [newPaginationParams, ...restParams] as P;
-    run(...mergerParams).catch(() => {
-      params.value = [oldPaginationParams, ...restParams] as P;
-    });
+    return run(...mergerParams);
   };
 
   const search = (paginationParams?: Record<string, any>) => {
@@ -133,7 +108,7 @@ function usePagination<R = any, P extends unknown[] = any>(
 
   const total = computed(() => responseData.value?.[totalKey] || 0);
 
-  const data = ref<Record<string, any>[]>([]);
+  const data = computed(() => responseData.value?.[dataKey] || []);
 
   const currentPage = computed({
     get: () =>
@@ -153,31 +128,13 @@ function usePagination<R = any, P extends unknown[] = any>(
     },
   });
 
-  const next = () => {
-    if (isLastPage.value) {
-      return;
-    }
-    changePage(currentPage.value + 1);
-  };
-
-  onMounted(() => {
-    changePage(1);
-  });
-
-  onReachBottom(() => {
-    if (loading.value) {
-      return;
-    }
-    next();
-  });
-
   return {
-    isLastPage,
     loading,
     data,
     currentPage,
     pageSize,
     total,
+    params,
     paging,
     search,
     reset,

@@ -1,4 +1,4 @@
-import { useUserStore } from "@/stores/user";
+import { useEmployeeStore } from "@/stores/employee";
 import Request, { HttpRequestConfig, HttpRequestTask } from "luch-request";
 
 const http = new Request({
@@ -10,9 +10,9 @@ http.interceptors.request.use(
     config.header = Object.assign({}, config.header || {}, {
       Accept: "application/json",
     });
-    const userStore = useUserStore();
-    if (userStore.token) {
-      config.header.Authorization = `Bearer ${userStore.token}`;
+    const employeeStore = useEmployeeStore();
+    if (employeeStore.token) {
+      config.header.Authorization = `Bearer ${employeeStore.token}`;
     }
     return config;
   },

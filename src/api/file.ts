@@ -1,4 +1,4 @@
-import { useUserStore } from "@/stores/user";
+import { useEmployeeStore } from "@/stores/employee";
 import request from "@/utils/request";
 import { HttpRequestConfig } from "luch-request";
 
@@ -10,14 +10,14 @@ interface UploadResponse {
 }
 
 export function uploadFileApi(path: string): Promise<UploadResponse> {
-  const userStore = useUserStore();
+  const employeeStore = useEmployeeStore();
   return new Promise((resolve, reject) => {
     uni.uploadFile({
       url: import.meta.env.VITE_API_BASE_URL + "/file/upload",
       filePath: path,
       name: "file",
       header: {
-        Authorization: `Bearer ${userStore.token}`,
+        Authorization: `Bearer ${employeeStore.token}`,
       },
       success: (res) => {
         resolve(JSON.parse(res.data));

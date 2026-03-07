@@ -3,10 +3,10 @@
 
 <script setup lang="ts">
 import { onLoad } from "@dcloudio/uni-app";
-import { useUserStore } from "@/stores/user";
+import { useEmployeeStore } from "@/stores/employee";
 import { UserLevel } from "@/utils/enums";
 
-const userStore = useUserStore()
+const employeeStore = useEmployeeStore()
 
 onLoad(async () => {
     uni.showLoading({
@@ -14,15 +14,16 @@ onLoad(async () => {
         mask: true
     })
 
-    await userStore.getAccessToken()
-    if (userStore.userLevel === UserLevel.Bound) {
-        await userStore.getUserInfo()
+    await employeeStore.getAccessToken()
+    if (employeeStore.employeeLevel === UserLevel.Bound) {
+        await employeeStore.getEmployeeInfo()
+        uni.reLaunch({
+            url: '/pages/home/home'
+        })
+    } else {
+        uni.reLaunch({
+            url: "/pages/login/login"
+        })
     }
-
-    uni.hideLoading()
-    uni.reLaunch({
-        // url: "/pages/home/home"
-        url: "/pages/mbr/list"
-    })
 })
 </script>

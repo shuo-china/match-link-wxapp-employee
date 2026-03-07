@@ -55,7 +55,7 @@ watch(visible, (newVal) => {
     .btn-wrapper {
         display: flex;
         justify-content: space-around;
-        column-gap: 24px;
+        column-gap: 18px;
 
         button {
             flex: 1;

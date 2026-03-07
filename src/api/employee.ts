@@ -13,9 +13,9 @@ export function getAccessTokenApi(
   });
 }
 
-export function getCurrentUserInfoApi(options?: HttpRequestConfig) {
+export function getCurrentEmployeeInfoApi(options?: HttpRequestConfig) {
   return request({
-    url: "/user/currentUser",
+    url: "/employee/currentEmployee",
     method: "GET",
     ...options,
   });
@@ -27,7 +27,7 @@ export function bindMobileApi(
 ) {
   return request({
     method: "POST",
-    url: "/user/bindMobile",
+    url: "/employee/bindMobile",
     data,
     ...options,
   });
@@ -35,7 +35,7 @@ export function bindMobileApi(
 
 export function unBindMobileApi(options?: HttpRequestConfig) {
   return request({
-    url: "/user/unBindMobile",
+    url: "/employee/unBindMobile",
     method: "GET",
     ...options,
   });

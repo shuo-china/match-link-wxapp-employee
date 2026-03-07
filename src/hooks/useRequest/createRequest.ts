@@ -1,4 +1,5 @@
-import { Ref, ref, shallowRef } from "vue";
+import type { Ref } from "vue";
+import { ref, shallowRef } from "vue";
 import type { InititalState, Options, PluginType, Service } from "./type";
 
 function createRequest<R = any, P extends unknown[] = any>(

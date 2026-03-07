@@ -1,33 +1,77 @@
 <template>
-    <view class="container">
-        <button class="login-btn" open-type="getPhoneNumber" @getphonenumber="login">授权登录</button>
+    <view class="login-container">
+        <view class="logo-section">
+            <image class="logo" src="/static/logo.png" mode="aspectFit" />
+            <view class="title">叁生禧员工端</view>
+            <view class="subtitle">仅限内部人员使用</view>
+        </view>
+
+        <view class="btn-wrapper">
+            <button type="primary" open-type="getPhoneNumber" @getphonenumber="login" :loading="loading"
+                :disabled="loading">
+                微信授权登录
+            </button>
+        </view>
     </view>
 </template>
 
 <script setup lang="ts">
-import { useUserStore } from "@/stores/user";
+import { ref } from "vue";
+import { useEmployeeStore } from "@/stores/employee";
 
-const userStore = useUserStore()
+const employeeStore = useEmployeeStore()
 
+const loading = ref(false)
 const login = (e) => {
     if (e.detail.code) {
-        userStore.bindMobile(e.detail.code).then(() => {
-            uni.navigateBack()
+        loading.value = true
+        employeeStore.bindMobile(e.detail.code).then(() => {
+            uni.reLaunch({
+                url: "/pages/home/home"
+            })
+        }).finally(() => {
+            loading.value = false
         })
     }
 }
 </script>
 
 <style lang="scss" scoped>
-.container {
-    padding: 0 12px;
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 24px 0;
+    box-sizing: border-box;
+    background-color: #fff;
 
-    .login-btn {
-        font-size: 16px;
-        padding: 2px 0;
-        color: white;
-        background-color: #876e49;
-        border-radius: 50px;
+    .logo-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 30px;
+        letter-spacing: 2px;
+
+        .logo {
+            width: 180px;
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #999;
+        }
+    }
+
+    .btn-wrapper {
+        width: 100%;
     }
 }
 </style>
