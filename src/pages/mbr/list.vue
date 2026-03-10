@@ -1,20 +1,37 @@
 <template>
     <view>
-        <!-- <uni-list>
-            <uni-list-item title="列表文字1" note="列表禁用状态1"
-                thumb="https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/unicloudlogo.png" thumb-size="lg"
-                rightText="rightText" to="/pages/mbr/detail"></uni-list-item>
-            <uni-list-item title="列表文字2" note="列表禁用状态2"></uni-list-item>
-            <uni-list-item title="列表文字3" note="列表禁用状态3"></uni-list-item>
-        </uni-list> -->
-
-        <button @tap="searchFormVisible = true">筛选</button>
+        <view class="filter-wrapper">
+            <view class="filter-left">共 {{ listRef?.total || 0 }} 条数据</view>
+            <view class="divider"></view>
+            <view class="filter-right" @tap="searchFormVisible = true">筛选</view>
+        </view>
         <uni-swipe-action ref="swipeActionRef">
             <pro-pagination ref="listRef" :request="getMbrPaginationApi" v-slot="{ data }">
                 <uni-list>
                     <uni-swipe-action-item v-for="item in data" :key="item.id" :rightOptions="rightOptions"
                         @click="e => handleClickActionItem(e, item)">
-                        <uni-list-item :title="item.name" note="列表禁用状态2" @tap="handleTapItem(item)"></uni-list-item>
+                        <uni-list-item :thumb="item.cover?.path" thumb-size="lg" @tap=" handleTapItem(item)">
+                            <template #body>
+                                <view class="item-body">
+                                    <view class="item-body-header">
+                                        <text class="item-body-name">{{ item.name }}</text>
+                                        <view class="item-body-gender" size="small"
+                                            :class="item.gender === '1' ? 'item-body-man' : 'item-body-woman'">
+                                            {{ item.age + '岁' }}
+                                        </view>
+                                        <text class="item-body-desc">{{ item.height + 'cm' }} / {{
+                                            item.marital_status_text }} / {{
+                                                item.education_text }}</text>
+                                    </view>
+                                    <view class="item-body-footer item-body-desc">
+                                        <text>年收{{ item.annualIncome + '万元' }} / </text>
+                                        <text v-if="item.hasHouse">有{{ item.houseCount }}套房 / </text>
+                                        <text v-else>无房 / </text>
+                                        <text>{{ item.hasVehicle ? '有车' : '无车' }}</text>
+                                    </view>
+                                </view>
+                            </template>
+                        </uni-list-item>
                     </uni-swipe-action-item>
                 </uni-list>
             </pro-pagination>
@@ -33,6 +50,30 @@
                             <uni-easyinput v-model="searchFormData.mobile" type="text" placeholder="请输入手机号" />
                         </uni-forms-item>
                     </uni-col>
+                    <uni-col :span="12">
+                        <uni-forms-item label="学历" name="education">
+                            <uni-data-select v-model="searchFormData.education" :localdata="dict?.education"
+                                :multiple="true" />
+                        </uni-forms-item>
+                    </uni-col>
+                    <uni-col :span="12">
+                        <uni-forms-item label="婚姻" name="marital_status">
+                            <uni-data-select v-model="searchFormData.maritalStatus" :localdata="dict?.marital_status"
+                                :multiple="true" />
+                        </uni-forms-item>
+                    </uni-col>
+                    <uni-col :span="24">
+                        <uni-forms-item label="最小年龄" name="minAge" label-position="left">
+                            <pro-slider v-model="searchFormData.minAge" :show-value="true" :min-unlimited="true" :min=15
+                                :max="60" />
+                        </uni-forms-item>
+                    </uni-col>
+                    <uni-col :span="24">
+                        <uni-forms-item label="最大年龄" name="maxAge" label-position="left">
+                            <pro-slider v-model="searchFormData.maxAge" :show-value="true" :max-unlimited="true"
+                                :min="15" :max="60" />
+                        </uni-forms-item>
+                    </uni-col>
                 </uni-row>
             </uni-forms>
         </pro-search-form>
@@ -40,9 +81,12 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import { deleteMbrApi, getMbrPaginationApi } from '@/api/mbr';
+import { onShow } from '@dcloudio/uni-app';
+import useDict from '@/hooks/useDict';
 
+const { dict } = useDict(['education', 'marital_status'])
 
 const swipeActionRef = ref()
 
@@ -98,7 +142,11 @@ const listRef = ref()
 const searchFormVisible = ref(false)
 const getInitialSearchFormData = () => ({
     name: '',
-    mobile: ''
+    mobile: '',
+    minAge: null,
+    maxAge: null,
+    education: [],
+    maritalStatus: []
 })
 const searchFormData = ref(getInitialSearchFormData())
 
@@ -112,4 +160,88 @@ const handleTapItem = (item) => {
         url: '/pages/mbr/detail?id=' + item.id
     })
 }
+
+let flag = false
+onShow(() => {
+    if (!flag) {
+        flag = true
+        return
+    }
+    listRef.value?.refresh()
+})
 </script>
+
+<style lang="scss" scoped>
+.filter-wrapper {
+    display: flex;
+    justify-content: space-around;
+    font-size: 13px;
+    color: #555;
+
+    .filter-left {
+        padding: 12px 0;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .filter-right {
+        padding: 12px 0;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .divider {
+        flex: 0 0 auto;
+        width: 1px;
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+}
+
+.item-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    &-header {
+        display: flex;
+        align-items: center;
+        column-gap: 10px;
+
+        .item-body-name {
+            font-size: 15px;
+            color: #3b4144;
+        }
+
+        .item-body-gender {
+            font-size: 12px;
+            padding: 1px 4px;
+            border-radius: 4px;
+            border-width: 1px;
+            border-style: solid;
+        }
+
+        .item-body-man {
+            color: #2979ff;
+            border-color: #2979ff;
+        }
+
+        .item-body-woman {
+            color: #e43d33;
+            border-color: #e43d33;
+        }
+    }
+
+    &-footer {
+        margin-top: 8px;
+    }
+
+    &-desc {
+        font-size: 13px;
+        color: #999;
+    }
+}
+</style>

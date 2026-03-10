@@ -7,9 +7,7 @@
         <text class="text">{{ item.text }}</text>
       </view>
     </view>
-
   </view>
-
 </template>
 
 <script setup lang="ts">
@@ -23,6 +21,11 @@ const fnList = [
     icon: "personadd",
     text: "添加会员",
     link: '/pages/mbr/form'
+  },
+  {
+    icon: "staff",
+    text: "用户列表",
+    link: '/pages/user/list'
   },
 ]
 
@@ -56,7 +59,7 @@ const handleTapFnItem = (item) => {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      row-gap: 3px;
+      row-gap: 4px;
       padding: 10px 0;
       border-radius: 3px;
       background-color: #fff;

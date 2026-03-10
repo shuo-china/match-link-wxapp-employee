@@ -25,6 +25,18 @@ export function createMbrApi(
   });
 }
 
+export function updateMbrApi(
+  data: Record<string, any>,
+  options?: HttpRequestConfig,
+) {
+  return request({
+    method: "POST",
+    url: "/member/update",
+    data,
+    ...options,
+  });
+}
+
 export function getMbrDetailApi(
   params: Record<string, any>,
   options?: HttpRequestConfig,

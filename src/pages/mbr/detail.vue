@@ -7,7 +7,7 @@
                         <uni-list-item title="姓名" :rightText="data.name" />
                         <uni-list-item title="性别" :rightText="getOptionLabelByValue(dict?.gender, data.gender)" />
                         <uni-list-item title="手机号" :rightText="data.mobile" />
-                        <uni-list-item title="出生年份" :rightText="data.birthYear + '年'" />
+                        <uni-list-item title="年龄" :rightText="data.age + '岁  ' + ' / ' + data.birthYear + '年'" />
                         <uni-list-item title="身高" :rightText="data.height + 'cm'" />
                         <uni-list-item title="学历" :rightText="getOptionLabelByValue(dict?.education, data.education)" />
                         <uni-list-item title="行业" :rightText="getOptionLabelByValue(dict?.industry, data.industry)" />
@@ -44,7 +44,16 @@
                         <uni-list-item v-if="data.hasHouse === 1" title="房子数量" :rightText="data.houseCount + '套'" />
                         <uni-list-item title="是否有车"
                             :rightText="getOptionLabelByValue(whetherOptions, data.hasVehicle)" />
+                    </uni-list>
+                </uni-card>
+            </uni-section>
+
+            <uni-section title="其他" type="line">
+                <uni-card margin="0 12px 6px" spacing="0" padding="0 8px">
+                    <uni-list :border="false" class="list-wrapper">
                         <uni-list-item title="备注" :rightText="data.remark" />
+                        <uni-list-item title="添加员工" :rightText="data.employee?.nickname" />
+                        <uni-list-item title="创建时间" :rightText="data.create_time" />
                     </uni-list>
                 </uni-card>
             </uni-section>

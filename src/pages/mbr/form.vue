@@ -81,10 +81,10 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { onReady } from '@dcloudio/uni-app';
+import { onLoad, onReady } from '@dcloudio/uni-app';
 import useDict from '@/hooks/useDict';
 import { birthYearOptions, heightOptions, whetherOptions } from '@/utils/options';
-import { createMbrApi } from '@/api/mbr';
+import { createMbrApi, getMbrDetailApi, updateMbrApi } from '@/api/mbr';
 
 const formRef = ref()
 const formData = ref({
@@ -231,11 +231,20 @@ const { dict } = useDict(['gender', 'industry', 'marital_status', 'education', '
 
 const submitForm = () => {
     formRef.value.validate().then((res) => {
-        createMbrApi({
+        let requestApi = id ? updateMbrApi : createMbrApi
+        const submitData = {
             ...res,
             albumKeys: res.albums.map(i => i.key)
-        }).then(res => {
-            console.log('res', res)
+        }
+        if (id) {
+            submitData.id = id
+        }
+        requestApi(submitData).then(() => {
+            uni.navigateBack().then(() => {
+                uni.showToast({
+                    title: id ? '修改成功' : '添加成功'
+                })
+            })
         })
     })
 }
@@ -250,6 +259,23 @@ watch(() => formData.value.hasHouse, (newVal) => {
 
 onReady(() => {
     formRef.value?.setRules(rules)
+})
+
+let id
+onLoad((options) => {
+    if (options?.id) {
+        id = options.id
+        uni.showLoading({
+            title: '加载中'
+        })
+        getMbrDetailApi({
+            id: options.id
+        }).then(res => {
+            formData.value = res
+        }).finally(() => {
+            uni.hideLoading()
+        })
+    }
 })
 </script>
 

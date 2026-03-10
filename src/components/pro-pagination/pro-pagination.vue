@@ -1,6 +1,6 @@
 <template>
     <slot :data="data"></slot>
-    <view class="pagination-wrapper">
+    <view v-if="data?.length" class="pagination-wrapper">
         <uni-pagination v-model="currentPage" :total="total" :page-size="pageSize" />
     </view>
 </template>
@@ -20,6 +20,7 @@ const { data, total, currentPage, pageSize, search, reset, refresh } =
     usePagination(props.request, props.requestOptions);
 
 const _expose = {
+    total,
     search,
     reset,
     refresh
@@ -30,6 +31,6 @@ defineExpose(_expose);
 
 <style lang="scss" scoped>
 .pagination-wrapper {
-    padding: 12px;
+    padding: 8px 12px;
 }
 </style>

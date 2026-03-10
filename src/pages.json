@@ -26,6 +26,9 @@
     },
     {
       "path": "pages/mbr/detail"
+    },
+    {
+      "path": "pages/user/list"
     }
   ],
   "globalStyle": {
