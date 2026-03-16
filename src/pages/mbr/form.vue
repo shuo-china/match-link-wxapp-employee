@@ -33,7 +33,7 @@
                 </uni-forms-item>
             </uni-card>
 
-            <uni-card padding="22px 10px 0">
+            <uni-card padding="22px 10px">
                 <uni-forms-item label="居住地" name="currentAddress" required>
                     <pro-picker mode="region" v-model="formData.currentAddress" :init-value="['江苏省', '徐州市', '鼓楼区']" />
                 </uni-forms-item>
@@ -46,8 +46,31 @@
                 <uni-forms-item label="婚姻" name="maritalStatus" required>
                     <pro-picker mode="selector" v-model="formData.maritalStatus" :options="dict?.marital_status" />
                 </uni-forms-item>
-                <uni-forms-item label="有无孩子" name="childrenStatus" required>
-                    <pro-picker mode="selector" v-model="formData.childrenStatus" :options="dict?.children_status" />
+                <uni-forms-item label="有无孩子" name="hasChildren" required>
+                    <uni-data-checkbox v-model="formData.hasChildren" :localdata="whetherOptions" mode="tag" />
+                </uni-forms-item>
+                <uni-forms-item v-if="formData.hasChildren === 1" label="孩子数量">
+                    <view class="number-box-wrapper">
+                        <uni-number-box v-model="childrenCount" :min="1" />个
+                    </view>
+                </uni-forms-item>
+                <uni-forms-item v-if="formData.hasChildren === 1" name="childrens" label-width="0">
+                    <uni-table border>
+                        <uni-tr>
+                            <uni-th width="50" align="center">序号</uni-th>
+                            <uni-th width="100" align="center">孩子性别</uni-th>
+                            <uni-th width="120" align="center">孩子跟谁</uni-th>
+                        </uni-tr>
+                        <uni-tr v-for="(item, index) in formData.childrens" :key="index">
+                            <uni-td align="center">{{ index + 1 }}</uni-td>
+                            <uni-td align="center">
+                                <pro-picker mode="selector" v-model="item.gender" :options="childGenderOptions" />
+                            </uni-td>
+                            <uni-td align="center">
+                                <pro-picker mode="selector" v-model="item.custody" :options="childCustodyOptions" />
+                            </uni-td>
+                        </uni-tr>
+                    </uni-table>
                 </uni-forms-item>
             </uni-card>
 
@@ -80,11 +103,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { onLoad, onReady } from '@dcloudio/uni-app';
 import useDict from '@/hooks/useDict';
-import { birthYearOptions, heightOptions, whetherOptions } from '@/utils/options';
+import { birthYearOptions, childCustodyOptions, childGenderOptions, heightOptions, whetherOptions } from '@/utils/options';
 import { createMbrApi, getMbrDetailApi, updateMbrApi } from '@/api/mbr';
+
+interface Child {
+    gender: string | null,
+    custody: string | null,
+}
 
 const formRef = ref()
 const formData = ref({
@@ -102,7 +130,8 @@ const formData = ref({
     permanentAddress: [],
     familys: [],
     maritalStatus: '',
-    childrenStatus: '',
+    hasChildren: null,
+    childrens: [] as Child[],
 
     annualIncome: 0,
     hasHouse: null,
@@ -225,12 +254,33 @@ const rules = {
             }
         ],
     },
+    hasChildren: {
+        rules: [
+            {
+                required: true,
+                errorMessage: '请选择是否有孩子',
+            }
+        ],
+    },
+    childrens: {
+        rules: [
+            {
+                validateFunction: function (_rule, _value, _data, callback) {
+                    if (formData.value.childrens.some(i => i.gender === null || i.custody === null)) {
+                        callback('请完善孩子信息')
+                    }
+                    return true
+                }
+            }
+        ]
+    }
 }
 
-const { dict } = useDict(['gender', 'industry', 'marital_status', 'education', 'children_status', 'family'])
+const { dict } = useDict(['gender', 'industry', 'marital_status', 'education', 'family'])
 
 const submitForm = () => {
-    formRef.value.validate().then((res) => {
+    formRef.value.validate().then(() => {
+        const res = formData.value as any
         let requestApi = id ? updateMbrApi : createMbrApi
         const submitData = {
             ...res,
@@ -257,6 +307,35 @@ watch(() => formData.value.hasHouse, (newVal) => {
     }
 })
 
+const childrenCount = computed({
+    get() {
+        return formData.value.childrens.length
+    },
+    set(newVal) {
+        if (newVal < formData.value.childrens.length) {
+            formData.value.childrens = formData.value.childrens.slice(0, newVal)
+        } else if (newVal > formData.value.childrens.length) {
+            for (let i = 0; i < newVal - formData.value.childrens.length; i++) {
+                formData.value.childrens.push({
+                    gender: null,
+                    custody: null,
+                })
+            }
+        }
+
+    }
+})
+watch(() => formData.value.hasChildren, (newVal) => {
+    if (newVal === 0) {
+        childrenCount.value = 0;
+    } else {
+        if (formData.value.childrens.length > 0) {
+            return
+        }
+        childrenCount.value = 1;
+    }
+})
+
 onReady(() => {
     formRef.value?.setRules(rules)
 })
@@ -271,7 +350,7 @@ onLoad((options) => {
         getMbrDetailApi({
             id: options.id
         }).then(res => {
-            formData.value = res
+            formData.value = Object.fromEntries(Object.entries(res).filter(([key]) => formData.value.hasOwnProperty(key))) as any
         }).finally(() => {
             uni.hideLoading()
         })

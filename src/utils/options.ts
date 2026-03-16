@@ -35,6 +35,28 @@ export const birthYearOptions = (() => {
   return options;
 })();
 
+export const childGenderOptions = [
+  {
+    text: "男孩",
+    value: 1,
+  },
+  {
+    text: "女孩",
+    value: 2,
+  },
+];
+
+export const childCustodyOptions = [
+  {
+    text: "跟自己",
+    value: 1,
+  },
+  {
+    text: "跟对方",
+    value: 2,
+  },
+];
+
 export const whetherOptions = [
   {
     text: "是",

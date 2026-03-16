@@ -22,7 +22,7 @@
             </uni-section>
 
             <uni-section title="家庭情况" type="line">
-                <uni-card margin="0 12px 6px" spacing="0" padding="0 8px">
+                <uni-card margin="0 12px 6px" spacing="0" padding="0 8px 15px">
                     <uni-list :border="false" class="list-wrapper">
                         <uni-list-item title="居住地" :rightText="data.currentAddress?.join('/')" />
                         <uni-list-item title="老家" :rightText="data.permanentAddress?.join('/')" />
@@ -30,8 +30,22 @@
                             :rightText="data.familys?.map(item => getOptionLabelByValue(dict?.family, item)).join('，')" />
                         <uni-list-item title="婚姻状态"
                             :rightText="getOptionLabelByValue(dict?.marital_status, data.maritalStatus)" />
-                        <uni-list-item title="有无孩子"
-                            :rightText="getOptionLabelByValue(dict?.children_status, data.childrenStatus)" />
+                        <uni-list-item title="是否有孩子"
+                            :rightText="getOptionLabelByValue(whetherOptions, data.hasChildren)" />
+                        <uni-table v-if="data.hasChildren" border>
+                            <uni-tr>
+                                <uni-th width="50" align="center">序号</uni-th>
+                                <uni-th width="100" align="center">孩子性别</uni-th>
+                                <uni-th width="120" align="center">孩子跟谁</uni-th>
+                            </uni-tr>
+                            <uni-tr v-for="(item, index) in data.childrens" :key="index">
+                                <uni-td align="center">{{ index as number + 1 }}</uni-td>
+                                <uni-td align="center">{{ getOptionLabelByValue(childGenderOptions, item.gender)
+                                }}</uni-td>
+                                <uni-td align="center">{{ getOptionLabelByValue(childCustodyOptions, item.custody)
+                                }}</uni-td>
+                            </uni-tr>
+                        </uni-table>
                     </uni-list>
                 </uni-card>
             </uni-section>
@@ -66,9 +80,9 @@ import { onLoad } from '@dcloudio/uni-app';
 import { getMbrDetailApi } from '@/api/mbr';
 import useRequest from '@/hooks/useRequest';
 import useDict from '@/hooks/useDict';
-import { getOptionLabelByValue, whetherOptions } from '@/utils/options';
+import { childCustodyOptions, childGenderOptions, getOptionLabelByValue, whetherOptions } from '@/utils/options';
 
-const { dict } = useDict(['gender', 'industry', 'marital_status', 'education', 'children_status', 'family'])
+const { dict } = useDict(['gender', 'industry', 'marital_status', 'education', 'family'])
 
 const { run, data } = useRequest(getMbrDetailApi, {
     manual: true

@@ -19,11 +19,10 @@
                                             :class="item.gender === '1' ? 'item-body-man' : 'item-body-woman'">
                                             {{ item.age + '岁' }}
                                         </view>
-                                        <text class="item-body-desc">{{ item.height + 'cm' }} / {{
-                                            item.marital_status_text }} / {{
-                                                item.education_text }}</text>
                                     </view>
                                     <view class="item-body-footer item-body-desc">
+                                        <text>{{ item.height + 'cm' }} / {{
+                                            item.education_text }} / {{ item.marital_status_text }} / </text>
                                         <text>年收{{ item.annualIncome + '万元' }} / </text>
                                         <text v-if="item.hasHouse">有{{ item.houseCount }}套房 / </text>
                                         <text v-else>无房 / </text>
@@ -63,15 +62,15 @@
                         </uni-forms-item>
                     </uni-col>
                     <uni-col :span="24">
-                        <uni-forms-item label="最小年龄" name="minAge" label-position="left">
-                            <pro-slider v-model="searchFormData.minAge" :show-value="true" :min-unlimited="true" :min=15
-                                :max="60" />
+                        <uni-forms-item label="年龄" name="age" label-position="left">
+                            <pro-slider-range v-model="searchFormData.age" :show-value="true" :min-unlimited="true"
+                                :max-unlimited="true" :min=15 :max="60" :value-formatter="(v) => v + '岁'" />
                         </uni-forms-item>
                     </uni-col>
                     <uni-col :span="24">
-                        <uni-forms-item label="最大年龄" name="maxAge" label-position="left">
-                            <pro-slider v-model="searchFormData.maxAge" :show-value="true" :max-unlimited="true"
-                                :min="15" :max="60" />
+                        <uni-forms-item label="身高" name="height" label-position="left">
+                            <pro-slider-range v-model="searchFormData.height" :show-value="true" :min-unlimited="true"
+                                :max-unlimited="true" :min=140 :max="200" :value-formatter="(v) => v + 'cm'" />
                         </uni-forms-item>
                     </uni-col>
                 </uni-row>
@@ -143,8 +142,8 @@ const searchFormVisible = ref(false)
 const getInitialSearchFormData = () => ({
     name: '',
     mobile: '',
-    minAge: null,
-    maxAge: null,
+    age: [null, null],
+    height: [null, null],
     education: [],
     maritalStatus: []
 })
@@ -210,15 +209,24 @@ onShow(() => {
         display: flex;
         align-items: center;
         column-gap: 10px;
+        min-width: 0;
 
         .item-body-name {
+            flex: 1;
+            min-width: 0;
             font-size: 15px;
             color: #3b4144;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .item-body-gender {
+            flex: 0 0 auto;
             font-size: 12px;
             padding: 1px 4px;
+            line-height: 1;
+            white-space: nowrap;
             border-radius: 4px;
             border-width: 1px;
             border-style: solid;
