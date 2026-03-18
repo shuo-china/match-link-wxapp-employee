@@ -22,7 +22,7 @@
             </uni-section>
 
             <uni-section title="家庭情况" type="line">
-                <uni-card margin="0 12px 6px" spacing="0" padding="0 8px 15px">
+                <uni-card margin="0 12px 6px" spacing="0" :padding="data.hasChildren ? '0 8px 15px' : '0 8px'">
                     <uni-list :border="false" class="list-wrapper">
                         <uni-list-item title="居住地" :rightText="data.currentAddress?.join('/')" />
                         <uni-list-item title="老家" :rightText="data.permanentAddress?.join('/')" />

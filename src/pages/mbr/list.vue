@@ -15,14 +15,14 @@
                                 <view class="item-body">
                                     <view class="item-body-header">
                                         <text class="item-body-name">{{ item.name }}</text>
-                                        <view class="item-body-gender" size="small"
-                                            :class="item.gender === '1' ? 'item-body-man' : 'item-body-woman'">
-                                            {{ item.age + '岁' }}
+                                        <view class="item-body-info">
+                                            <text :class="item.gender === '1' ? 'gender-man' : 'gender-woman'">{{
+                                                item.age }}岁</text>
+                                            <text> · {{ item.height }}cm · {{ item.education_text }}</text>
                                         </view>
                                     </view>
                                     <view class="item-body-footer item-body-desc">
-                                        <text>{{ item.height + 'cm' }} / {{
-                                            item.education_text }} / {{ item.marital_status_text }} / </text>
+                                        <text>{{ item.marital_status_text }} / </text>
                                         <text>年收{{ item.annualIncome + '万元' }} / </text>
                                         <text v-if="item.hasHouse">有{{ item.houseCount }}套房 / </text>
                                         <text v-else>无房 / </text>
@@ -202,17 +202,18 @@ onShow(() => {
 
 .item-body {
     flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
 
     &-header {
-        display: flex;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
         align-items: center;
         column-gap: 10px;
         min-width: 0;
 
         .item-body-name {
-            flex: 1;
             min-width: 0;
             font-size: 15px;
             color: #3b4144;
@@ -221,25 +222,20 @@ onShow(() => {
             white-space: nowrap;
         }
 
-        .item-body-gender {
-            flex: 0 0 auto;
-            font-size: 12px;
-            padding: 1px 4px;
+        .item-body-info {
+            justify-self: end;
+            font-size: 13px;
             line-height: 1;
             white-space: nowrap;
-            border-radius: 4px;
-            border-width: 1px;
-            border-style: solid;
+            color: #666;
         }
 
-        .item-body-man {
+        .gender-man {
             color: #2979ff;
-            border-color: #2979ff;
         }
 
-        .item-body-woman {
+        .gender-woman {
             color: #e43d33;
-            border-color: #e43d33;
         }
     }
 
