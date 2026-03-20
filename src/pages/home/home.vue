@@ -46,6 +46,12 @@ const fnList = [
     bgColor: 'linear-gradient(135deg, #07c160, #2bdc8d)'
   },
   {
+    icon: 'phone',
+    text: '跟进记录',
+    link: '/pages/track/list',
+    bgColor: 'linear-gradient(135deg, #f59e0b, #f97316)'
+  },
+  {
     icon: 'map',
     text: '数据统计',
     link: '/pages/stat/list',

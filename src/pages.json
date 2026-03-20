@@ -29,6 +29,12 @@
     },
     {
       "path": "pages/user/list"
+    },
+    {
+      "path": "pages/track/list"
+    },
+    {
+      "path": "pages/track/form"
     }
   ],
   "globalStyle": {

@@ -1,6 +1,13 @@
 import request from "@/utils/request";
 import { HttpRequestConfig } from "luch-request";
 
+export function getMbrOptionsApi() {
+  return request({
+    method: "GET",
+    url: "/member/options",
+  });
+}
+
 export function getMbrPaginationApi(
   params: Record<string, any>,
   options?: HttpRequestConfig,
