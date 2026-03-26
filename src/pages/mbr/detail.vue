@@ -5,12 +5,12 @@
                 <uni-card margin="0 12px 6px" spacing="0" padding="0 8px">
                     <uni-list :border="false" class="list-wrapper">
                         <uni-list-item title="姓名" :rightText="data.name" />
-                        <uni-list-item title="性别" :rightText="getOptionLabelByValue(dict?.gender, data.gender)" />
+                        <uni-list-item title="性别" :rightText="data.gender_text" />
                         <uni-list-item title="手机号" :rightText="data.mobile" />
                         <uni-list-item title="年龄" :rightText="data.age + '岁  ' + ' / ' + data.birthYear + '年'" />
                         <uni-list-item title="身高" :rightText="data.height + 'cm'" />
-                        <uni-list-item title="学历" :rightText="getOptionLabelByValue(dict?.education, data.education)" />
-                        <uni-list-item title="行业" :rightText="getOptionLabelByValue(dict?.industry, data.industry)" />
+                        <uni-list-item title="学历" :rightText="data.education_text" />
+                        <uni-list-item title="行业" :rightText="data.industry_text" />
                         <uni-list-item title="职业" :rightText="data.occupation" />
                         <uni-list-item title="相册">
                             <template #footer>
@@ -28,8 +28,7 @@
                         <uni-list-item title="老家" :rightText="data.permanentAddress?.join('/')" />
                         <uni-list-item title="家庭成员"
                             :rightText="data.familys?.map(item => getOptionLabelByValue(dict?.family, item)).join('，')" />
-                        <uni-list-item title="婚姻状态"
-                            :rightText="getOptionLabelByValue(dict?.marital_status, data.maritalStatus)" />
+                        <uni-list-item title="婚姻状态" :rightText="data.marital_status_text" />
                         <uni-list-item title="是否有孩子"
                             :rightText="getOptionLabelByValue(whetherOptions, data.hasChildren)" />
                         <uni-table v-if="data.hasChildren" border>
@@ -76,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { onLoad } from '@dcloudio/uni-app';
+import { onLoad, onShareAppMessage } from '@dcloudio/uni-app';
 import { getMbrDetailApi } from '@/api/mbr';
 import useRequest from '@/hooks/useRequest';
 import useDict from '@/hooks/useDict';
@@ -88,7 +87,26 @@ const { run, data } = useRequest(getMbrDetailApi, {
     manual: true
 })
 
+let currentId = ''
+
+const getShareContent = () => {
+    const detail = data.value
+    const gender = detail.gender_text
+    const tags = [
+        gender,
+        detail?.age ? detail.age + '岁' : '',
+        detail?.height ? detail.height + 'cm' : '',
+    ].filter(Boolean)
+
+    return {
+        title: `${detail.name}${tags.length ? '｜' + tags.join('｜') : ''}`,
+        path: '/pages/transfer/transfer?memberId=' + currentId,
+        imageUrl: detail?.albums?.[0]?.path || undefined
+    }
+}
+
 onLoad((options) => {
+    currentId = options?.id || ''
     if (options?.id) {
         uni.showLoading({
             title: '加载中'
@@ -99,6 +117,10 @@ onLoad((options) => {
             uni.hideLoading()
         })
     }
+})
+
+onShareAppMessage(() => {
+    return getShareContent()
 })
 </script>
 

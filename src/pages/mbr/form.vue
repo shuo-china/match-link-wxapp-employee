@@ -290,10 +290,10 @@ const submitForm = () => {
             submitData.id = id
         }
         requestApi(submitData).then(() => {
-            uni.navigateBack().then(() => {
-                uni.showToast({
-                    title: id ? '修改成功' : '添加成功'
-                })
+            return uni.navigateBack()
+        }).then(() => {
+            uni.showToast({
+                title: id ? '修改成功' : '添加成功'
             })
         })
     })

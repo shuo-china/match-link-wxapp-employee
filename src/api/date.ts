@@ -1,85 +1,73 @@
 import request from "@/utils/request";
 import { HttpRequestConfig } from "luch-request";
 
-export function getMbrOptionsApi(
-  params: Record<string, any>,
-  options?: HttpRequestConfig,
-) {
-  return request({
-    method: "GET",
-    url: "/member/options",
-    params,
-    ...options,
-  });
-}
-
-export function getMbrPaginationApi(
+export function getDatePaginationApi(
   params: Record<string, any>,
   options?: HttpRequestConfig,
 ) {
   return request<Pagination>({
     method: "GET",
-    url: "/member/pagination",
+    url: "/date/pagination",
     params,
     ...options,
   });
 }
 
-export function createMbrApi(
-  data: Record<string, any>,
-  options?: HttpRequestConfig,
-) {
-  return request({
-    method: "POST",
-    url: "/member/create",
-    data,
-    ...options,
-  });
-}
-
-export function updateMbrApi(
-  data: Record<string, any>,
-  options?: HttpRequestConfig,
-) {
-  return request({
-    method: "POST",
-    url: "/member/update",
-    data,
-    ...options,
-  });
-}
-
-export function getMbrDetailApi(
+export function getDateListApi(
   params: Record<string, any>,
   options?: HttpRequestConfig,
 ) {
   return request({
     method: "GET",
-    url: "/member/detail",
+    url: "/date/list",
     params,
     ...options,
   });
 }
 
-export function getMbrRoughDetailApi(
-  params: Record<string, any>,
-  options?: HttpRequestConfig,
-) {
-  return request({
-    method: "GET",
-    url: "/member/roughDetail",
-    params,
-    ...options,
-  });
-}
-
-export function deleteMbrApi(
+export function createDateApi(
   data: Record<string, any>,
   options?: HttpRequestConfig,
 ) {
   return request({
     method: "POST",
-    url: "/member/delete",
+    url: "/date/create",
+    data,
+    ...options,
+  });
+}
+
+export function updateDateApi(
+  data: Record<string, any>,
+  options?: HttpRequestConfig,
+) {
+  return request({
+    method: "POST",
+    url: "/date/update",
+    data,
+    ...options,
+  });
+}
+
+export function getDateDetailApi(
+  params: Record<string, any>,
+  options?: HttpRequestConfig,
+) {
+  return request({
+    method: "GET",
+    url: "/date/detail",
+    params,
+    ...options,
+  });
+}
+
+export function deleteDateApi(
+  data: Record<string, any>,
+  options?: HttpRequestConfig,
+) {
+  return request({
+    method: "POST",
+    url: "/date/delete",
     data,
     ...options,
   });

@@ -10,6 +10,9 @@
       "path": "pages/launch/launch"
     },
     {
+      "path": "pages/transfer/transfer"
+    },
+    {
       "path": "pages/login/login"
     },
     {
@@ -25,7 +28,12 @@
       "path": "pages/mbr/list"
     },
     {
-      "path": "pages/mbr/detail"
+      "path": "pages/mbr/detail",
+      "style": {
+        "mp-weixin": {
+          "enableShareAppMessage": true
+        }
+      }
     },
     {
       "path": "pages/user/list"
@@ -35,6 +43,21 @@
     },
     {
       "path": "pages/track/form"
+    },
+    {
+      "path": "pages/date/list"
+    },
+    {
+      "path": "pages/date/detail"
+    },
+    {
+      "path": "pages/date/form"
+    },
+    {
+      "path": "pages/date/cal"
+    },
+    {
+      "path": "pages/stats/stats"
     }
   ],
   "globalStyle": {

@@ -1,16 +1,26 @@
 <template>
     <view>
         <view class="filter-wrapper">
-            <view class="filter-left">共 {{ listRef?.total || 0 }} 条数据</view>
+            <view class="filter-left">共 <text class="highlight">{{ listRef?.total || 0 }}</text> 条数据</view>
             <view class="divider"></view>
-            <view class="filter-right" @tap="searchFormVisible = true">筛选</view>
+            <view class="filter-right" @tap="searchFormVisible = true">
+                <uni-icons type="settings-filled" size="16" color="#666"></uni-icons>
+                <text class="filter-text">筛选</text>
+            </view>
         </view>
         <uni-swipe-action ref="swipeActionRef">
             <pro-pagination ref="listRef" :request="getMbrPaginationApi" v-slot="{ data }">
                 <uni-list>
                     <uni-swipe-action-item v-for="item in data" :key="item.id" :rightOptions="rightOptions"
                         @click="e => handleClickActionItem(e, item)">
-                        <uni-list-item :thumb="item.cover?.path" thumb-size="lg" @tap=" handleTapItem(item)">
+                        <uni-list-item @tap="handleTapItem(item)">
+                            <template #header>
+                                <image v-if="item.cover?.path" class="item-avatar" :src="item.cover?.path"
+                                    mode="aspectFill"></image>
+                                <view v-else class="item-avatar avatar-placeholder">
+                                    <uni-icons type="person-filled" size="40" color="#c0c4cc"></uni-icons>
+                                </view>
+                            </template>
                             <template #body>
                                 <view class="item-body">
                                     <view class="item-body-header">
@@ -22,11 +32,11 @@
                                         </view>
                                     </view>
                                     <view class="item-body-footer item-body-desc">
-                                        <text>{{ item.marital_status_text }} / </text>
-                                        <text>年收{{ item.annualIncome + '万元' }} / </text>
-                                        <text v-if="item.hasHouse">有{{ item.houseCount }}套房 / </text>
-                                        <text v-else>无房 / </text>
-                                        <text>{{ item.hasVehicle ? '有车' : '无车' }}</text>
+                                        <text class="tag">{{ item.marital_status_text }}</text>
+                                        <text class="tag">年收{{ item.annualIncome + '万元' }}</text>
+                                        <text class="tag" v-if="item.hasHouse">有{{ item.houseCount }}套房</text>
+                                        <text class="tag" v-else>无房</text>
+                                        <text class="tag">{{ item.hasVehicle ? '有车' : '无车' }}</text>
                                     </view>
                                 </view>
                             </template>
@@ -173,31 +183,62 @@ onShow(() => {
 <style lang="scss" scoped>
 .filter-wrapper {
     display: flex;
-    justify-content: space-around;
-    font-size: 13px;
-    color: #555;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #666;
+    background-color: #ffffff;
+    padding: 12px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 99;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    margin-bottom: 8px;
 
     .filter-left {
-        padding: 12px 0;
         flex: 1;
         display: flex;
         align-items: center;
-        justify-content: center;
+
+        .highlight {
+            color: #2979ff;
+            font-weight: bold;
+            margin: 0 4px;
+        }
     }
 
     .filter-right {
-        padding: 12px 0;
-        flex: 1;
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-end;
+        padding-left: 16px;
+
+        .filter-text {
+            margin-left: 4px;
+        }
     }
 
     .divider {
-        flex: 0 0 auto;
+        height: 14px;
         width: 1px;
-        background-color: rgba(0, 0, 0, 0.1);
+        background-color: #e5e5e5;
     }
+}
+
+.item-avatar {
+    vertical-align: top;
+    width: 55px;
+    height: 55px;
+    border-radius: 4px;
+    margin-right: 12px;
+    background-color: #f5f7fa;
+    flex-shrink: 0;
+}
+
+.avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .item-body {
@@ -205,29 +246,35 @@ onShow(() => {
     min-width: 0;
     display: flex;
     flex-direction: column;
+    justify-content: center;
 
     &-header {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
+        display: flex;
+        justify-content: space-between;
         align-items: center;
-        column-gap: 10px;
-        min-width: 0;
+        margin-bottom: 12px;
 
         .item-body-name {
-            min-width: 0;
             font-size: 15px;
-            color: #3b4144;
+            font-weight: 600;
+            color: #333;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            padding-right: 6px;
         }
 
         .item-body-info {
-            justify-self: end;
-            font-size: 13px;
-            line-height: 1;
-            white-space: nowrap;
+            flex-shrink: 0;
+            font-size: 14px;
             color: #666;
+            display: flex;
+            align-items: center;
+        }
+
+        .gender-man,
+        .gender-woman {
+            margin-right: 4px;
         }
 
         .gender-man {
@@ -240,12 +287,21 @@ onShow(() => {
     }
 
     &-footer {
-        margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
     }
 
     &-desc {
-        font-size: 13px;
-        color: #999;
+        .tag {
+            font-size: 13px;
+            color: #666;
+            background: #f5f7fa;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
     }
 }
 </style>

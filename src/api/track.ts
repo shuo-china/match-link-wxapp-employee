@@ -1,85 +1,61 @@
 import request from "@/utils/request";
 import { HttpRequestConfig } from "luch-request";
 
-export function getMbrOptionsApi(
-  params: Record<string, any>,
-  options?: HttpRequestConfig,
-) {
-  return request({
-    method: "GET",
-    url: "/member/options",
-    params,
-    ...options,
-  });
-}
-
-export function getMbrPaginationApi(
+export function getTrackPaginationApi(
   params: Record<string, any>,
   options?: HttpRequestConfig,
 ) {
   return request<Pagination>({
     method: "GET",
-    url: "/member/pagination",
+    url: "/track/pagination",
     params,
     ...options,
   });
 }
 
-export function createMbrApi(
+export function createTrackApi(
   data: Record<string, any>,
   options?: HttpRequestConfig,
 ) {
   return request({
     method: "POST",
-    url: "/member/create",
+    url: "/track/create",
     data,
     ...options,
   });
 }
 
-export function updateMbrApi(
+export function updateTrackApi(
   data: Record<string, any>,
   options?: HttpRequestConfig,
 ) {
   return request({
     method: "POST",
-    url: "/member/update",
+    url: "/track/update",
     data,
     ...options,
   });
 }
 
-export function getMbrDetailApi(
+export function getTrackDetailApi(
   params: Record<string, any>,
   options?: HttpRequestConfig,
 ) {
   return request({
     method: "GET",
-    url: "/member/detail",
+    url: "/track/detail",
     params,
     ...options,
   });
 }
 
-export function getMbrRoughDetailApi(
-  params: Record<string, any>,
-  options?: HttpRequestConfig,
-) {
-  return request({
-    method: "GET",
-    url: "/member/roughDetail",
-    params,
-    ...options,
-  });
-}
-
-export function deleteMbrApi(
+export function deleteTrackApi(
   data: Record<string, any>,
   options?: HttpRequestConfig,
 ) {
   return request({
     method: "POST",
-    url: "/member/delete",
+    url: "/track/delete",
     data,
     ...options,
   });

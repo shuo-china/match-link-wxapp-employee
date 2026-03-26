@@ -1,138 +1,260 @@
 <template>
     <view class="track-list-page">
-        <!-- 顶部操作栏 -->
-        <view class="header">
-            <view class="filter-bar">
-                <text class="filter-text">筛选</text>
-                <text class="filter-icon">▼</text>
+        <view class="filter-wrapper">
+            <view class="filter-left">
+                <button class="add-btn" @click="handleAdd">
+                    <uni-icons type="plusempty" size="14" color="#ffffff"></uni-icons>
+                    <text class="btn-text">添加跟进记录</text>
+                </button>
             </view>
-            <button class="add-btn" type="primary" size="mini" @click="handleAdd">添加跟踪记录</button>
+            <view class="divider"></view>
+            <view class="filter-right" @tap="searchFormVisible = true">
+                <uni-icons type="settings-filled" size="16" color="#666"></uni-icons>
+                <text class="filter-text">筛选</text>
+            </view>
         </view>
 
-        <!-- 跟踪记录列表 -->
-        <scroll-view scroll-y class="list-container">
-            <view class="record-item" v-for="item in mockList" :key="item.id">
-                <!-- 头部：时间和付费意愿 -->
-                <view class="record-header">
-                    <text class="time">跟踪时间：{{ item.trackTime }}</text>
-                    <view class="willingness" :class="item.willingnessLevel">
-                        意愿：{{ item.willingness }}
-                    </view>
-                </view>
+        <view class="list-container">
+            <uni-swipe-action ref="swipeActionRef">
+                <pro-pagination ref="listRef" :request="getTrackPaginationApi" v-slot="{ data }">
+                    <view class="record-item" v-for="item in data" :key="item.id">
+                        <uni-swipe-action-item :rightOptions="rightOptions"
+                            @click="e => handleClickActionItem(e, item)">
+                            <view @tap="handleTapItem(item)">
+                                <view class="record-header">
+                                    <text class="time">跟进时间：{{ item.create_time }}</text>
+                                    <view class="willingness" :class="getIntentionClass(item.intention)">
+                                        {{ item.intention_text }}
+                                    </view>
+                                </view>
 
-                <!-- 主体：会员信息和备注 -->
-                <view class="member-info">
-                    <image class="avatar" :src="item.avatar" mode="aspectFill"></image>
-                    <view class="info-details">
-                        <view class="name-row">
-                            <text class="name">{{ item.name }}</text>
-                            <text class="tag">{{ item.age }}岁</text>
-                            <text class="tag">{{ item.job }}</text>
-                        </view>
-                        <view class="remark">
-                            备注：{{ item.remark }}
-                        </view>
+                                <view class="member-info-wrapper">
+                                    <view class="member-info">
+                                        <image class="avatar" :src="item.member?.cover?.path" mode="aspectFill"></image>
+                                        <view class="info-details">
+                                            <view class="name-row">
+                                                <text class="name">{{ item.member?.name }}</text>
+                                                <view class="tags">
+                                                    <text class="tag"
+                                                        :class="item.member?.gender === '1' ? 'gender-man' : 'gender-woman'">
+                                                        {{ item.member?.age }}岁
+                                                    </text>
+                                                    <text class="tag" v-if="item.member?.job_text">{{
+                                                        item.member?.job_text }}</text>
+                                                </view>
+                                            </view>
+                                            <view class="matchmaker-row">
+                                                <view class="info-item">
+                                                    <text class="label">跟进红娘：</text>
+                                                    <text class="value">{{ item.employee?.nickname || '-' }}</text>
+                                                </view>
+                                            </view>
+                                        </view>
+                                    </view>
+                                    <view class="remark-box">
+                                        <text class="value remark-text">{{ item.remark || '暂无备注' }}</text>
+                                    </view>
+                                </view>
+                            </view>
+                        </uni-swipe-action-item>
                     </view>
-                </view>
-            </view>
+                    <view class="empty-tip" v-if="!data?.length">暂无跟进记录</view>
+                </pro-pagination>
+            </uni-swipe-action>
+        </view>
 
-            <view class="empty-tip" v-if="mockList.length === 0">暂无跟踪记录</view>
-        </scroll-view>
+        <pro-search-form v-model:visible="searchFormVisible" @reset="handleReset"
+            @search="() => listRef.search(searchFormData)">
+            <uni-forms label-position="top">
+                <uni-row :gutter="36">
+                    <uni-col :span="12">
+                        <uni-forms-item label="会员姓名" name="name">
+                            <uni-easyinput v-model="searchFormData.name" type="text" placeholder="请输入会员姓名" />
+                        </uni-forms-item>
+                    </uni-col>
+                    <uni-col :span="12">
+                        <uni-forms-item label="会员手机号" name="mobile">
+                            <uni-easyinput v-model="searchFormData.mobile" type="text" placeholder="请输入会员手机号" />
+                        </uni-forms-item>
+                    </uni-col>
+                    <uni-col :span="24">
+                        <uni-forms-item label="付费意向" name="intention">
+                            <uni-data-select v-model="searchFormData.intention" :localdata="dict?.purchase_intention"
+                                :multiple="true" />
+                        </uni-forms-item>
+                    </uni-col>
+                </uni-row>
+            </uni-forms>
+        </pro-search-form>
     </view>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { deleteTrackApi, getTrackPaginationApi } from '@/api/track';
+import { onShow } from '@dcloudio/uni-app';
+import useDict from '@/hooks/useDict';
+const { dict } = useDict(['purchase_intention'])
 
-// 模拟数据
-const mockList = ref([
+const swipeActionRef = ref()
+const listRef = ref()
+
+const rightOptions = [
     {
-        id: 1,
-        trackTime: '2023-10-25 14:30',
-        willingness: '高',
-        willingnessLevel: 'high',
-        avatar: 'https://cdn.uviewui.com/uview/album/1.jpg',
-        name: '张三',
-        age: 28,
-        job: '软件工程师',
-        remark: '客户对高端匹配服务非常感兴趣，但是觉得价格稍微有点超出预算，需要跟进提供分期方案或者优惠活动，下次沟通时间定在周五。'
+        action: 'edit',
+        text: '编辑',
+        style: {
+            color: '#fff',
+            backgroundColor: '#2979ff'
+        }
     },
     {
-        id: 2,
-        trackTime: '2023-10-24 10:15',
-        willingness: '中',
-        willingnessLevel: 'medium',
-        avatar: 'https://cdn.uviewui.com/uview/album/2.jpg',
-        name: '李四',
-        age: 32,
-        job: '产品经理',
-        remark: '初步沟通，了解了基本需求，暂无明确付费意向，保持常规跟进。'
-    },
-    {
-        id: 3,
-        trackTime: '2023-10-22 16:45',
-        willingness: '低',
-        willingnessLevel: 'low',
-        avatar: 'https://cdn.uviewui.com/uview/album/3.jpg',
-        name: '王五',
-        age: 26,
-        job: '设计师',
-        remark: '觉得目前没有迫切需求，暂时不需要服务，建议一个月后再回访。'
+        action: 'delete',
+        text: '删除',
+        style: {
+            color: '#fff',
+            backgroundColor: '#e43d33',
+        }
     }
-]);
+]
+
+const searchFormVisible = ref(false)
+const getInitialSearchFormData = () => ({
+    name: '',
+    mobile: '',
+    intention: []
+})
+const searchFormData = ref(getInitialSearchFormData())
+
+const getIntentionClass = (value) => {
+    const intention = Number(value)
+    if (intention === 3) return 'high'
+    if (intention === 2) return 'medium'
+    return 'low'
+}
 
 const handleAdd = () => {
-    uni.showToast({
-        title: '点击了添加跟踪记录',
-        icon: 'none'
+    uni.navigateTo({
+        url: '/pages/track/form'
     });
-};
+}
+
+const handleTapItem = (item) => {
+    uni.navigateTo({
+        url: '/pages/mbr/detail?id=' + item.member_id
+    })
+}
+
+const handleReset = () => {
+    searchFormData.value = getInitialSearchFormData()
+    listRef.value?.search(searchFormData.value)
+}
+
+const handleClickActionItem = (e, item) => {
+    switch (e.content.action) {
+        case 'edit':
+            uni.navigateTo({
+                url: '/pages/track/form?id=' + item.id
+            }).then(() => {
+                swipeActionRef.value?.closeAll()
+            })
+            break;
+
+        case 'delete':
+            uni.showModal({
+                title: '提示',
+                content: '是否删除',
+                success: res => {
+                    if (res.confirm) {
+                        deleteTrackApi({
+                            id: item.id
+                        }).then(() => {
+                            listRef.value?.refresh()
+                        })
+                    }
+                }
+            });
+            break;
+    }
+}
+
+let flag = false
+onShow(() => {
+    if (!flag) {
+        flag = true
+        return
+    }
+    listRef.value?.refresh()
+})
 </script>
 
 <style lang="scss" scoped>
 .track-list-page {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+    min-height: 100vh;
     background-color: #f5f5f5;
 }
 
-.header {
+.filter-wrapper {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20rpx 30rpx;
-    background-color: #fff;
-    border-bottom: 1rpx solid #eee;
-}
-
-.filter-bar {
-    display: flex;
-    align-items: center;
-    font-size: 28rpx;
-    color: #333;
-    padding: 10rpx;
-}
-
-.filter-icon {
-    font-size: 20rpx;
-    margin-left: 8rpx;
+    font-size: 14px;
     color: #666;
+    background-color: #ffffff;
+    padding: 12px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 99;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    margin-bottom: 8px;
+
+    .filter-left {
+        flex: 1;
+        display: flex;
+        align-items: center;
+    }
+
+    .filter-right {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-left: 16px;
+
+        .filter-text {
+            margin-left: 4px;
+        }
+    }
+
+    .divider {
+        height: 14px;
+        width: 1px;
+        background-color: #e5e5e5;
+    }
 }
 
 .add-btn {
     margin: 0;
-    font-size: 26rpx;
-    background-color: #007aff;
+    font-size: 13px;
+    background-color: #2979ff;
     color: #fff;
-    border-radius: 8rpx;
-    padding: 0 30rpx;
-    height: 60rpx;
-    line-height: 60rpx;
+    border-radius: 100px;
+    padding: 0 14px;
+    height: 30px;
+    line-height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &::after {
+        border: none;
+    }
+
+    .btn-text {
+        margin-left: 2px;
+    }
 }
 
 .list-container {
-    flex: 1;
     padding: 20rpx;
     box-sizing: border-box;
 }
@@ -166,8 +288,8 @@ const handleAdd = () => {
 }
 
 .willingness.high {
-    color: #ff4d4f;
-    background-color: #fff1f0;
+    color: #52c41a;
+    background-color: #f6ffed;
 }
 
 .willingness.medium {
@@ -176,40 +298,67 @@ const handleAdd = () => {
 }
 
 .willingness.low {
-    color: #52c41a;
-    background-color: #f6ffed;
+    color: #999999;
+    background-color: #f5f5f5;
+}
+
+.member-info-wrapper {
+    display: flex;
+    flex-direction: column;
 }
 
 .member-info {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
 }
 
 .avatar {
     width: 90rpx;
     height: 90rpx;
     border-radius: 50%;
-    margin-right: 20rpx;
+    margin-right: 24rpx;
     flex-shrink: 0;
-    background-color: #eee;
+    background-color: #f5f5f5;
+    border: 2rpx solid #f0f0f0;
 }
 
 .info-details {
     flex: 1;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .name-row {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     margin-bottom: 12rpx;
+}
+
+.matchmaker-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .name {
     font-size: 30rpx;
     font-weight: bold;
     color: #333;
-    margin-right: 16rpx;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 12rpx;
+}
+
+.tags {
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
+    flex-shrink: 0;
 }
 
 .tag {
@@ -217,20 +366,60 @@ const handleAdd = () => {
     color: #666;
     background-color: #f5f5f5;
     padding: 4rpx 12rpx;
-    border-radius: 4rpx;
-    margin-right: 12rpx;
+    border-radius: 6rpx;
+    flex-shrink: 0;
 }
 
-.remark {
-    font-size: 26rpx;
+.tag.gender-man {
+    color: #2979ff;
+    background-color: #eaf3ff;
+}
+
+.tag.gender-woman {
+    color: #e43d33;
+    background-color: #ffefee;
+}
+
+.remark-box {
+    background-color: #fafafa;
+    border-radius: 8rpx;
+    padding: 16rpx;
+    display: flex;
+    align-items: flex-start;
+    border: 1px solid #f0f0f0;
+    margin-top: 20rpx;
+    font-size: 24rpx;
+    line-height: 1.4;
+}
+
+.remark-box .value {
+    color: #333;
+    flex: 1;
+    word-break: break-all;
+    text-align: justify;
+}
+
+.remark-box .remark-text {
     color: #666;
-    line-height: 1.5;
-    /* 多行文本省略号处理 */
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+}
+
+.info-item {
+    display: flex;
+    font-size: 24rpx;
+    align-items: center;
+}
+
+.info-item .label {
+    color: #999;
+    flex-shrink: 0;
+}
+
+.info-item .value {
+    color: #333;
+    flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .empty-tip {
