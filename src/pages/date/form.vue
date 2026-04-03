@@ -3,10 +3,12 @@
         <uni-card>
             <uni-forms ref="formRef" label-position="top" :label-width="200" :modelValue="formData">
                 <uni-forms-item label="男会员" name="male_member_id">
-                    <pro-combox v-model="formData.male_member_id" :options="maleMbrOptions" placeholder="请选择男会员" />
+                    <pro-combox-mbr v-model="formData.male_member_id" :requestParams="() => ({ gender: '1' })"
+                        placeholder="请选择男会员" />
                 </uni-forms-item>
                 <uni-forms-item label="女会员" name="female_member_id">
-                    <pro-combox v-model="formData.female_member_id" :options="femaleMbrOptions" placeholder="请选择女会员" />
+                    <pro-combox-mbr v-model="formData.female_member_id" :requestParams="() => ({ gender: '2' })"
+                        placeholder="请选择女会员" />
                 </uni-forms-item>
                 <uni-forms-item label="约会时间" name="date_time">
                     <uni-datetime-picker type="datetime" :hide-second="true" v-model="formData.date_time"
@@ -34,18 +36,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { getMbrOptionsApi } from '@/api/mbr'
+import { getCurrentInstance, ref } from 'vue'
 import { createDateApi, getDateDetailApi, updateDateApi } from '@/api/date'
-import useRequest from '@/hooks/useRequest'
 import useDict from '@/hooks/useDict'
 import { onLoad, onReady } from '@dcloudio/uni-app'
 
 const { dict } = useDict(['date_result'])
 let isEdit = false
-
-const { data: maleMbrOptions } = useRequest(() => getMbrOptionsApi({ gender: '1' }))
-const { data: femaleMbrOptions } = useRequest(() => getMbrOptionsApi({ gender: '2' }))
 
 const formData = ref({
     male_member_id: '',
@@ -70,6 +67,8 @@ const rules = {
     }
 }
 
+let eventChannel: any = null
+
 const submitForm = () => {
     formRef.value.validate().then((res) => {
         let requestApi = id ? updateDateApi : createDateApi
@@ -78,10 +77,12 @@ const submitForm = () => {
             submitData.id = id
         }
         requestApi(submitData).then(() => {
-            uni.navigateBack()
+            return uni.navigateBack()
         }).then(() => {
-            uni.showToast({
-                title: id ? '修改成功' : '添加成功'
+            eventChannel?.emit('refresh')
+            eventChannel?.emit('toast', {
+                title: id ? '修改成功' : '添加成功',
+                icon: 'success'
             })
         })
     })
@@ -93,6 +94,7 @@ onReady(() => {
 
 let id
 onLoad((options) => {
+    eventChannel = (getCurrentInstance()?.proxy as any)?.getOpenerEventChannel?.()
     if (options?.id) {
         id = options.id
         isEdit = true

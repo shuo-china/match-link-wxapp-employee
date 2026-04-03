@@ -40,3 +40,63 @@ export function unBindMobileApi(options?: HttpRequestConfig) {
     ...options,
   });
 }
+
+export function getEmpPaginationApi(
+  params: Record<string, any>,
+  options?: HttpRequestConfig,
+) {
+  return request<Pagination>({
+    method: "GET",
+    url: "/employee/pagination",
+    params,
+    ...options,
+  });
+}
+
+export function createEmpApi(
+  data: Record<string, any>,
+  options?: HttpRequestConfig,
+) {
+  return request({
+    method: "POST",
+    url: "/employee/create",
+    data,
+    ...options,
+  });
+}
+
+export function updateEmpApi(
+  data: Record<string, any>,
+  options?: HttpRequestConfig,
+) {
+  return request({
+    method: "POST",
+    url: "/employee/update",
+    data,
+    ...options,
+  });
+}
+
+export function getEmpDetailApi(
+  params: Record<string, any>,
+  options?: HttpRequestConfig,
+) {
+  return request({
+    method: "GET",
+    url: "/employee/detail",
+    params,
+    ...options,
+  });
+}
+
+export function deleteEmpApi(
+  data: Record<string, any>,
+  options?: HttpRequestConfig,
+) {
+  return request({
+    method: "POST",
+    url: "/employee/delete",
+    data,
+    ...options,
+  });
+}

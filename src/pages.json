@@ -58,17 +58,26 @@
     },
     {
       "path": "pages/stats/stats"
+    },
+    {
+      "path": "pages/emp/list"
+    },
+    {
+      "path": "pages/emp/form"
+    },
+    {
+      "path": "pages/emp/detail"
     }
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "叁生禧",
+    "navigationBarTitleText": "徐州大胆恋爱",
     "navigationBarBackgroundColor": "#F8F8F8",
     "backgroundColor": "#F8F8F8"
   },
   "tabBar": {
     "color": "#666666",
-    "selectedColor": "#764c24",
+    "selectedColor": "#7f6641",
     "list": [
       {
         "pagePath": "pages/home/home",

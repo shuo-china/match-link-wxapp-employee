@@ -15,10 +15,15 @@
                         @click="e => handleClickActionItem(e, item)">
                         <uni-list-item @tap="handleTapItem(item)">
                             <template #header>
-                                <image v-if="item.cover?.path" class="item-avatar" :src="item.cover?.path"
-                                    mode="aspectFill"></image>
-                                <view v-else class="item-avatar avatar-placeholder">
-                                    <uni-icons type="person-filled" size="40" color="#c0c4cc"></uni-icons>
+                                <view class="avatar-wrapper">
+                                    <image v-if="item.cover?.path" class="item-avatar" :src="item.cover?.path"
+                                        mode="aspectFill"></image>
+                                    <view v-else class="item-avatar avatar-placeholder">
+                                        <uni-icons type="person-filled" size="40" color="#c0c4cc"></uni-icons>
+                                    </view>
+                                    <view class="vip-badge" v-if="item.vipLevel === '2'">
+                                        <text class="vip-text">VIP</text>
+                                    </view>
                                 </view>
                             </template>
                             <template #body>
@@ -92,7 +97,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { deleteMbrApi, getMbrPaginationApi } from '@/api/mbr';
-import { onShow } from '@dcloudio/uni-app';
 import useDict from '@/hooks/useDict';
 
 const { dict } = useDict(['education', 'marital_status'])
@@ -122,7 +126,15 @@ const handleClickActionItem = (e, item) => {
     switch (e.content.action) {
         case 'edit':
             uni.navigateTo({
-                url: '/pages/mbr/form?id=' + item.id
+                url: '/pages/mbr/form?id=' + item.id,
+                events: {
+                    refresh: () => {
+                        listRef.value?.refresh()
+                    },
+                    toast(data) {
+                        uni.showToast(data)
+                    }
+                }
             }).then(() => {
                 swipeActionRef.value?.closeAll()
             })
@@ -170,14 +182,6 @@ const handleTapItem = (item) => {
     })
 }
 
-let flag = false
-onShow(() => {
-    if (!flag) {
-        flag = true
-        return
-    }
-    listRef.value?.refresh()
-})
 </script>
 
 <style lang="scss" scoped>
@@ -225,14 +229,43 @@ onShow(() => {
     }
 }
 
+.avatar-wrapper {
+    position: relative;
+    margin-right: 12px;
+}
+
 .item-avatar {
     vertical-align: top;
     width: 55px;
     height: 55px;
     border-radius: 4px;
-    margin-right: 12px;
     background-color: #f5f7fa;
     flex-shrink: 0;
+}
+
+.vip-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+    padding: 2px 6px;
+    border-radius: 10px;
+    border: 1px solid rgba(235, 209, 151, 0.5);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .vip-text {
+        color: #ebd197;
+        font-size: 10px;
+        font-weight: 600;
+        font-style: italic;
+        letter-spacing: 0.5px;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+        line-height: 1;
+    }
 }
 
 .avatar-placeholder {

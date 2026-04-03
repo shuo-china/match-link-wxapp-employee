@@ -1,273 +1,294 @@
 <template>
     <view class="container">
-        <!-- 顶部浪漫渐变背景 -->
-        <view class="bg-header"></view>
+        <view v-if="data">
+            <!-- 顶部背景 -->
+            <view class="header-bg" :class="{ 'male-theme': data && data.gender === '1' }">
+                <view class="bg-circle-1"></view>
+                <view class="bg-circle-2"></view>
 
-        <view class="content-wrapper">
-            <view class="title-section">
-                <text class="main-title">为您推荐优质嘉宾</text>
-                <text class="sub-title">遇见心动的TA</text>
-            </view>
-
-            <view v-if="memberInfo" class="member-card">
-                <view class="card-bg"></view>
-                <view class="avatar-wrap">
-                    <image class="avatar" :src="memberInfo.albums?.[0]?.path" mode="aspectFill"></image>
-                </view>
-
-                <view class="info">
-                    <view class="name-row">
-                        <text class="name">{{ memberInfo.name }}</text>
-                    </view>
-
-                    <view class="tags">
-                        <view class="tag tag-item" v-if="memberInfo.age">
-                            <text class="tag-text">{{ memberInfo.age }}岁</text>
-                        </view>
-                        <view class="tag tag-item" v-if="memberInfo.height">
-                            <text class="tag-text">{{ memberInfo.height }}cm</text>
-                        </view>
-                        <view class="tag tag-item" v-if="memberInfo.education_text">
-                            <text class="tag-text">{{ memberInfo.education_text }}</text>
-                        </view>
-                        <view class="tag tag-item" v-if="memberInfo.marital_status_text">
-                            <text class="tag-text">{{ memberInfo.marital_status_text }}</text>
-                        </view>
-                        <view class="tag tag-item" v-if="memberInfo.job_text">
-                            <text class="tag-text">{{ memberInfo.job_text }}</text>
+                <!-- 用户头部信息 -->
+                <view class="user-header">
+                    <view class="avatar-box">
+                        <image v-if="data.albums?.length" class="avatar" :src="data.albums[0].path" mode="aspectFill">
+                        </image>
+                        <view v-else class="avatar default-avatar">
+                            <uni-icons type="person-filled" size="70" color="#ccc"></uni-icons>
                         </view>
                     </view>
-
-                    <view class="divider"></view>
-                    <view class="desc-text">点击下方按钮，查看TA的详细资料与照片</view>
+                    <view class="header-info">
+                        <view class="name-row">
+                            <text class="nickname">{{ data.age }}岁</text>
+                            <view class="gender-icon" :class="data.gender === '1' ? 'male' : 'female'">
+                                <uni-icons v-if="data.gender === '1'" font-family="iconfont" size="15"
+                                    color="#fff">&#xe7e2;</uni-icons>
+                                <uni-icons v-else font-family="iconfont" size="15" color="#fff">&#xe8f1;</uni-icons>
+                            </view>
+                        </view>
+                        <view class="sub-info">
+                            <text>{{ data.height + 'cm' }} · {{ data.education_text }}</text>
+                        </view>
+                    </view>
                 </view>
             </view>
 
-            <view v-else class="loading-state">
-                <text>正在为您加载嘉宾信息...</text>
-            </view>
+            <view class="content-wrapper">
+                <!-- 基础资料卡片 -->
+                <view class="info-card">
+                    <view class="card-title">基础资料</view>
+                    <view class="basic-info-grid">
+                        <view class="info-tag" v-if="data.marital_status_text">
+                            <uni-icons font-family="iconfont" size="18" color="#666">&#xe7df</uni-icons>
+                            <text>{{ data.marital_status_text }}</text>
+                        </view>
+                        <view class="info-tag" v-if="data.job_text">
+                            <uni-icons font-family="iconfont" size="18" color="#666">&#xe897</uni-icons>
+                            <text>{{ data.job_text }}</text>
+                        </view>
+                        <view class="info-tag" v-if="data.annualIncome">
+                            <uni-icons font-family="iconfont" size="18" color="#666">&#xe7cd</uni-icons>
+                            <text>年收入{{ data.annualIncome }}万元</text>
+                        </view>
+                        <view class="info-tag" v-if="data.hasHouse">
+                            <uni-icons font-family="iconfont" size="18" color="#666">&#xe7c6</uni-icons>
+                            <text v-if="data.houseCount === 1">有房</text>
+                            <text v-else>{{ data.houseCount }}套房</text>
+                        </view>
+                        <view class="info-tag" v-if="data.hasVehicle">
+                            <uni-icons font-family="iconfont" size="18" color="#666">&#xe7d7</uni-icons>
+                            <text>有车</text>
+                        </view>
+                        <view class="info-tag" v-if="data.familys">
+                            <uni-icons font-family="iconfont" size="18" color="#666">&#xe7ae</uni-icons>
+                            <text>{{ data.familys_text }}</text>
+                        </view>
+                        <view class="info-tag" v-if="data.permanentAddress?.length">
+                            <uni-icons font-family="iconfont" size="18" color="#666">&#xe790</uni-icons>
+                            <text>{{ data.permanentAddress[1] }} / {{ data.permanentAddress[2] }}</text>
+                        </view>
+                        <view class="info-tag" v-if="data.childrens_text">
+                            <uni-icons font-family="iconfont" size="18" color="#666">&#xe783</uni-icons>
+                            <text>{{ data.childrens_text }}</text>
+                        </view>
+                    </view>
+                </view>
 
-            <view class="btn-group">
-                <button class="nav-btn" hover-class="btn-hover" @click="handleNavigate">
-                    <text>查看更多资料</text>
-                </button>
+                <!-- 照片墙 -->
+                <view class="photo-card" v-for="(item, index) in data.albums" :key="index">
+                    <image class="photo" :src="item.path" mode="widthFix" @click="previewImage(index as number)">
+                    </image>
+                </view>
             </view>
         </view>
+        <pro-loading v-else></pro-loading>
     </view>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { onLoad } from '@dcloudio/uni-app';
+import { onLoad, onShareAppMessage } from '@dcloudio/uni-app';
 import { getMbrRoughDetailApi } from '@/api/mbr';
+import { getShareMbrDetail } from '@/utils/share';
 
-let memberId = '';
-const memberInfo = ref<any>(null);
+const data = ref<any>(null);
+
+const previewImage = (index: number) => {
+    if (data.value?.albums?.length) {
+        uni.previewImage({
+            urls: data.value.albums.map(item => item.path),
+            current: data.value.albums[index].path
+        })
+    }
+}
 
 onLoad((options) => {
     if (options?.memberId) {
-        memberId = options.memberId;
-        getMbrRoughDetailApi({ id: memberId }).then((res) => {
-            memberInfo.value = res;
+        getMbrRoughDetailApi({ id: options.memberId }).then((res) => {
+            data.value = res;
         });
     }
 });
 
-const handleNavigate = () => {
-    if (memberId) {
-        uni.navigateToMiniProgram({
-            appId: 'wx31ccfafb7c027857',
-            path: 'pages/mbr/detail?id=' + memberId,
-            extraData: {
-                memberId
-            },
-            envVersion: 'develop'
-        });
-    } else {
-        uni.showToast({ title: '缺少会员ID参数', icon: 'none' });
-    }
-};
+onShareAppMessage(() => {
+    return getShareMbrDetail(data.value)
+})
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .container {
     min-height: 100vh;
-    background-color: #fcf9f9;
+    background-color: #f7f8fa;
     position: relative;
-    overflow: hidden;
-}
 
-.bg-header {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 460rpx;
-    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
-    border-radius: 0 0 60rpx 60rpx;
-    z-index: 0;
-}
+    .header-bg {
+        // 使用 mine 页面同款渐变色
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
 
-.content-wrapper {
-    position: relative;
-    z-index: 1;
-    padding: 60rpx 40rpx;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+        &.male-theme {
+            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+        }
 
-.title-section {
-    text-align: center;
-    margin-bottom: 50rpx;
-    margin-top: 20rpx;
-    color: #fff;
-}
+        width: 100%;
+        padding: 40px 20px 60px;
+        box-sizing: border-box;
+        position: relative;
+        overflow: hidden;
+        border-bottom-left-radius: 30px;
+        border-bottom-right-radius: 30px;
 
-.main-title {
-    font-size: 44rpx;
-    font-weight: 600;
-    display: block;
-    margin-bottom: 12rpx;
-    text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.1);
-}
+        .bg-circle-1 {
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            pointer-events: none;
+        }
 
-.sub-title {
-    font-size: 28rpx;
-    opacity: 0.9;
-}
+        .bg-circle-2 {
+            position: absolute;
+            bottom: -20px;
+            left: -20px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            pointer-events: none;
+        }
 
-.member-card {
-    width: 100%;
-    background-color: #fff;
-    border-radius: 32rpx;
-    padding: 0 0 50rpx 0;
-    margin-bottom: 60rpx;
-    box-shadow: 0 16rpx 40rpx rgba(255, 154, 158, 0.15);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-}
+        .user-header {
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 10;
 
-.card-bg {
-    width: 100%;
-    height: 160rpx;
-    background: linear-gradient(to bottom, #fff0f3, #ffffff);
-}
+            .avatar-box {
+                margin-right: 16px;
 
-.avatar-wrap {
-    margin-top: -100rpx;
-    padding: 8rpx;
-    background: #fff;
-    border-radius: 50%;
-    box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.08);
-}
+                .avatar {
+                    width: 85px;
+                    height: 85px;
+                    border-radius: 50%;
+                    border: 2px solid rgba(255, 255, 255, 0.8);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
-.avatar {
-    width: 180rpx;
-    height: 180rpx;
-    border-radius: 50%;
-    background-color: #f0f0f0;
-    display: block;
-}
+                    &.default-avatar {
+                        background-color: #fff;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                }
+            }
 
-.info {
-    width: 100%;
-    padding: 0 40rpx;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+            .header-info {
+                flex: 1;
+                color: #fff; // 保持白色字体以适应深色或渐变背景
 
-.name-row {
-    margin: 24rpx 0;
-}
+                .name-row {
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 12px;
+                    line-height: 1;
 
-.name {
-    font-size: 40rpx;
-    font-weight: bold;
-    color: #333;
-}
+                    .nickname {
+                        font-size: 22px;
+                        font-weight: bold;
+                        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    }
 
-.tags {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 16rpx;
-    margin-bottom: 30rpx;
-}
+                    .gender-icon {
+                        margin-left: 12px;
+                        width: 22px;
+                        height: 22px;
+                        background: rgba(255, 255, 255, 0.2);
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        backdrop-filter: blur(2px);
+                        border: 1px solid rgba(255, 255, 255, 0.3);
+                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                    }
+                }
 
-.tag {
-    padding: 8rpx 24rpx;
-    border-radius: 100rpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+                .sub-info {
+                    display: inline-flex;
+                    align-items: center;
+                    background: rgba(0, 0, 0, 0.2);
+                    padding: 4px 12px;
+                    border-radius: 14px;
+                    font-size: 13px;
+                    backdrop-filter: blur(4px);
 
-.tag-text {
-    font-size: 24rpx;
-    font-weight: 500;
-}
+                    .divider {
+                        margin: 0 4px;
+                    }
+                }
+            }
+        }
+    }
 
-.tag-item {
-    background: #f5f5f5;
-    color: #666666;
-}
+    .content-wrapper {
+        padding: 0 16px 30px;
+        margin-top: -40px;
+        position: relative;
+        z-index: 10;
+    }
 
-.divider {
-    width: 80%;
-    height: 2rpx;
-    background-color: #f0f0f0;
-    margin: 20rpx 0;
-}
+    .info-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
 
-.desc-text {
-    font-size: 24rpx;
-    color: #999;
-    margin-top: 10rpx;
-}
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 16px;
+        }
 
-.loading-state {
-    height: 400rpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 28rpx;
-}
+        .basic-info-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
 
-.btn-group {
-    width: 100%;
-    padding: 0 20rpx;
-    box-sizing: border-box;
-}
+            .info-tag {
+                display: flex;
+                align-items: center;
+                background: #f5f6fa;
+                padding: 8px 14px;
+                border-radius: 12px;
+                font-size: 13px;
+                color: #000;
+                font-weight: 500;
 
-.nav-btn {
-    width: 100%;
-    height: 96rpx;
-    border-radius: 48rpx;
-    background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
-    color: #fff;
-    font-size: 32rpx;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 12rpx 24rpx rgba(255, 117, 140, 0.3);
-    border: none;
-}
+                uni-icons {
+                    margin-right: 6px;
+                }
+            }
+        }
+    }
 
-.nav-btn::after {
-    border: none;
-}
+    .photo-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 0;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
 
-.btn-hover {
-    transform: translateY(2rpx);
-    box-shadow: 0 6rpx 12rpx rgba(255, 117, 140, 0.3);
-    opacity: 0.9;
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        .photo {
+            width: 100%;
+            display: block;
+        }
+    }
 }
 </style>

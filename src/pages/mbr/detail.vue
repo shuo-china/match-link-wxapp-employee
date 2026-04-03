@@ -17,6 +17,7 @@
                                 <pro-upload v-model="data.albums" :disabled="true" />
                             </template>
                         </uni-list-item>
+                        <uni-list-item title="会员等级" :rightText="data.vip_level_text" />
                     </uni-list>
                 </uni-card>
             </uni-section>
@@ -80,33 +81,15 @@ import { getMbrDetailApi } from '@/api/mbr';
 import useRequest from '@/hooks/useRequest';
 import useDict from '@/hooks/useDict';
 import { childCustodyOptions, childGenderOptions, getOptionLabelByValue, whetherOptions } from '@/utils/options';
+import { getShareMbrDetail } from '@/utils/share';
 
-const { dict } = useDict(['gender', 'industry', 'marital_status', 'education', 'family'])
+const { dict } = useDict(['family'])
 
 const { run, data } = useRequest(getMbrDetailApi, {
     manual: true
 })
 
-let currentId = ''
-
-const getShareContent = () => {
-    const detail = data.value
-    const gender = detail.gender_text
-    const tags = [
-        gender,
-        detail?.age ? detail.age + '岁' : '',
-        detail?.height ? detail.height + 'cm' : '',
-    ].filter(Boolean)
-
-    return {
-        title: `${detail.name}${tags.length ? '｜' + tags.join('｜') : ''}`,
-        path: '/pages/transfer/transfer?memberId=' + currentId,
-        imageUrl: detail?.albums?.[0]?.path || undefined
-    }
-}
-
 onLoad((options) => {
-    currentId = options?.id || ''
     if (options?.id) {
         uni.showLoading({
             title: '加载中'
@@ -120,7 +103,7 @@ onLoad((options) => {
 })
 
 onShareAppMessage(() => {
-    return getShareContent()
+    return getShareMbrDetail(data.value)
 })
 </script>
 

@@ -69,7 +69,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { deleteDateApi, getDatePaginationApi } from '@/api/date';
-import { onShow } from '@dcloudio/uni-app';
 
 const swipeActionRef = ref()
 const listRef = ref()
@@ -95,7 +94,15 @@ const rightOptions = [
 
 const handleAdd = () => {
     uni.navigateTo({
-        url: '/pages/date/form'
+        url: '/pages/date/form',
+        events: {
+            refresh: () => {
+                listRef.value?.refresh()
+            },
+            toast(data) {
+                uni.showToast(data)
+            }
+        }
     });
 }
 
@@ -109,7 +116,15 @@ const handleClickActionItem = (e, item) => {
     switch (e.content.action) {
         case 'edit':
             uni.navigateTo({
-                url: '/pages/date/form?id=' + item.id
+                url: '/pages/date/form?id=' + item.id,
+                events: {
+                    refresh: () => {
+                        listRef.value?.refresh()
+                    },
+                    toast(data) {
+                        uni.showToast(data)
+                    }
+                }
             }).then(() => {
                 swipeActionRef.value?.closeAll()
             })
@@ -132,15 +147,6 @@ const handleClickActionItem = (e, item) => {
             break;
     }
 }
-
-let flag = false
-onShow(() => {
-    if (!flag) {
-        flag = true
-        return
-    }
-    listRef.value?.refresh()
-})
 </script>
 
 <style lang="scss" scoped>

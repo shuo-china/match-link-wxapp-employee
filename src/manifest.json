@@ -8,7 +8,7 @@
   /* 5+App特有相关 */
   "app-plus": {
     "usingComponents": true,
-    "nvueStyleCompiler": "叁生禧",
+    "nvueStyleCompiler": "徐州大胆恋爱",
     "compilerVersion": 3,
     "splashscreen": {
       "alwaysShowBeforeRender": true,
@@ -50,12 +50,11 @@
   "quickapp": {},
   /* 小程序特有相关 */
   "mp-weixin": {
-    "appid": "wx31ccfafb7c027857",
+    "appid": "wx52736327e8ad537a",
     "setting": {
       "urlCheck": false
     },
-    "usingComponents": true,
-    "navigateToMiniProgramAppIdList": ["wxdc1fde650ff92103"]
+    "usingComponents": true
   },
   "mp-alipay": {
     "usingComponents": true

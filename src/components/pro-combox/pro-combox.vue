@@ -91,7 +91,6 @@ const select = (item: ComboxOption) => {
 }
 
 const clear = () => {
-    console.log('clear')
     modelValue.value = ''
     keyword.value = ''
     open.value = false

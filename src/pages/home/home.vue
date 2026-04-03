@@ -5,11 +5,17 @@
       <view class="hero-card">
         <view class="user-profile">
           <view class="avatar-box">
-            <uni-icons type="person-filled" size="40" color="#8B5A2B"></uni-icons>
+            <image
+              v-if="employeeInfo?.avatarPath"
+              class="avatar-image"
+              :src="employeeInfo.avatarPath"
+              mode="aspectFill"
+            />
+            <uni-icons v-else type="person-filled" size="40" color="#8B5A2B"></uni-icons>
           </view>
           <view class="user-info">
             <view class="greeting">{{ employeeInfo?.nickname }}</view>
-            <view class="role-tag">红娘顾问 · 门店代表</view>
+            <view class="role-tag">红娘顾问</view>
           </view>
         </view>
         <view class="decoration-circle"></view>
@@ -39,60 +45,73 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useEmployeeStore } from '@/stores/employee';
 import { storeToRefs } from 'pinia';
 
 const employeeStore = useEmployeeStore()
 const { employeeInfo } = storeToRefs(employeeStore)
 
-const fnList = [
-  {
-    icon: 'person',
-    text: '会员列表',
-    link: '/pages/mbr/list',
-    bgColor: 'linear-gradient(135deg, #5b7dff, #7b9aff)'
-  },
-  {
-    icon: 'personadd',
-    text: '添加会员',
-    link: '/pages/mbr/form',
-    bgColor: 'linear-gradient(135deg, #14b8a6, #2dd4bf)'
-  },
-  {
-    icon: 'weixin',
-    text: '小程序用户',
-    link: '/pages/user/list',
-    bgColor: 'linear-gradient(135deg, #07c160, #2bdc8d)'
-  },
-  {
-    icon: 'phone',
-    text: '跟进记录',
-    link: '/pages/track/list',
-    bgColor: 'linear-gradient(135deg, #f59e0b, #f97316)'
-  },
-  {
-    icon: 'heart',
-    text: '约会记录',
-    link: '/pages/date/list',
-    bgColor: 'linear-gradient(135deg, #f472b6, #ec4899)'
-  },
-  {
-    icon: 'calendar',
-    text: '约会日程',
-    link: '/pages/date/cal',
-    bgColor: 'linear-gradient(135deg, #00b4d8, #48cae4)'
-  },
-  {
-    icon: 'map',
-    text: '数据统计',
-    link: '/pages/stats/stats',
-    bgColor: 'linear-gradient(135deg, #8b5cf6, #a855f7)'
-  },
-]
+const fnList = computed(() => {
+  const list = [
+    {
+      icon: 'person',
+      text: '会员列表',
+      link: '/pages/mbr/list',
+      bgColor: 'linear-gradient(135deg, #5b7dff, #7b9aff)'
+    },
+    {
+      icon: 'personadd',
+      text: '添加会员',
+      link: '/pages/mbr/form',
+      bgColor: 'linear-gradient(135deg, #14b8a6, #2dd4bf)'
+    },
+    {
+      icon: 'weixin',
+      text: '小程序用户',
+      link: '/pages/user/list',
+      bgColor: 'linear-gradient(135deg, #07c160, #2bdc8d)'
+    },
+    {
+      icon: 'phone',
+      text: '跟进记录',
+      link: '/pages/track/list',
+      bgColor: 'linear-gradient(135deg, #f59e0b, #f97316)'
+    },
+    {
+      icon: 'heart',
+      text: '约会记录',
+      link: '/pages/date/list',
+      bgColor: 'linear-gradient(135deg, #f472b6, #ec4899)'
+    },
+    {
+      icon: 'calendar',
+      text: '约会日程',
+      link: '/pages/date/cal',
+      bgColor: 'linear-gradient(135deg, #00b4d8, #48cae4)'
+    }
+  ];
+
+  if (employeeInfo.value?.isSuper) {
+    list.push({
+      icon: 'headphones',
+      text: '红娘列表',
+      link: '/pages/emp/list',
+      bgColor: 'linear-gradient(135deg, #8b5cf6, #a855f7)'
+    });
+  }
+
+  return list;
+});
 
 const handleTapFnItem = (item) => {
   uni.navigateTo({
-    url: item.link
+    url: item.link,
+    events: {
+      toast(data) {
+        uni.showToast(data)
+      }
+    }
   })
 }
 </script>
@@ -137,6 +156,12 @@ const handleTapFnItem = (item) => {
     justify-content: center;
     border: 2px solid rgba(255, 255, 255, 0.4);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+
+    .avatar-image {
+      width: 100%;
+      height: 100%;
+    }
   }
 
   .user-info {

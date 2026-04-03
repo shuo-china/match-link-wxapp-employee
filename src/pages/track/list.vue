@@ -51,8 +51,8 @@
                                             </view>
                                         </view>
                                     </view>
-                                    <view class="remark-box">
-                                        <text class="value remark-text">{{ item.remark || '暂无备注' }}</text>
+                                    <view v-if="item.remark" class="remark-box">
+                                        <text class="value remark-text">{{ item.remark }}</text>
                                     </view>
                                 </view>
                             </view>
@@ -92,7 +92,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { deleteTrackApi, getTrackPaginationApi } from '@/api/track';
-import { onShow } from '@dcloudio/uni-app';
 import useDict from '@/hooks/useDict';
 const { dict } = useDict(['purchase_intention'])
 
@@ -135,7 +134,15 @@ const getIntentionClass = (value) => {
 
 const handleAdd = () => {
     uni.navigateTo({
-        url: '/pages/track/form'
+        url: '/pages/track/form',
+        events: {
+            refresh: () => {
+                listRef.value?.refresh()
+            },
+            toast(data) {
+                uni.showToast(data)
+            }
+        }
     });
 }
 
@@ -154,7 +161,15 @@ const handleClickActionItem = (e, item) => {
     switch (e.content.action) {
         case 'edit':
             uni.navigateTo({
-                url: '/pages/track/form?id=' + item.id
+                url: '/pages/track/form?id=' + item.id,
+                events: {
+                    refresh: () => {
+                        listRef.value?.refresh()
+                    },
+                    toast(data) {
+                        uni.showToast(data)
+                    }
+                }
             }).then(() => {
                 swipeActionRef.value?.closeAll()
             })
@@ -177,15 +192,6 @@ const handleClickActionItem = (e, item) => {
             break;
     }
 }
-
-let flag = false
-onShow(() => {
-    if (!flag) {
-        flag = true
-        return
-    }
-    listRef.value?.refresh()
-})
 </script>
 
 <style lang="scss" scoped>

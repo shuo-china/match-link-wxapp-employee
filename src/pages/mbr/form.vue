@@ -31,6 +31,9 @@
                 <uni-forms-item label="相册" name="albums">
                     <pro-upload v-model="formData.albums" />
                 </uni-forms-item>
+                <uni-forms-item label="会员等级" name="vipLevel" required>
+                    <pro-picker mode="selector" v-model="formData.vipLevel" :options="dict?.vip_level" />
+                </uni-forms-item>
             </uni-card>
 
             <uni-card padding="22px 10px">
@@ -103,7 +106,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, getCurrentInstance, ref, watch } from 'vue';
 import { onLoad, onReady } from '@dcloudio/uni-app';
 import useDict from '@/hooks/useDict';
 import { birthYearOptions, childCustodyOptions, childGenderOptions, heightOptions, whetherOptions } from '@/utils/options';
@@ -123,6 +126,7 @@ const formData = ref({
     height: '',
     education: '',
     industry: '',
+    vipLevel: '',
     occupation: '',
     albums: [],
 
@@ -194,6 +198,14 @@ const rules = {
             {
                 required: true,
                 errorMessage: '请选择行业',
+            }
+        ],
+    },
+    vipLevel: {
+        rules: [
+            {
+                required: true,
+                errorMessage: '请选择会员等级',
             }
         ],
     },
@@ -276,7 +288,9 @@ const rules = {
     }
 }
 
-const { dict } = useDict(['gender', 'industry', 'marital_status', 'education', 'family'])
+const { dict } = useDict(['gender', 'industry', 'marital_status', 'education', 'family', 'vip_level'])
+
+let eventChannel: any = null
 
 const submitForm = () => {
     formRef.value.validate().then(() => {
@@ -292,8 +306,10 @@ const submitForm = () => {
         requestApi(submitData).then(() => {
             return uni.navigateBack()
         }).then(() => {
-            uni.showToast({
-                title: id ? '修改成功' : '添加成功'
+            eventChannel?.emit('refresh')
+            eventChannel?.emit('toast', {
+                title: id ? '修改成功' : '添加成功',
+                icon: 'success'
             })
         })
     })
@@ -342,6 +358,7 @@ onReady(() => {
 
 let id
 onLoad((options) => {
+    eventChannel = (getCurrentInstance()?.proxy as any)?.getOpenerEventChannel?.()
     if (options?.id) {
         id = options.id
         uni.showLoading({

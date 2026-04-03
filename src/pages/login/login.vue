@@ -2,14 +2,14 @@
     <view class="login-container">
         <view class="logo-section">
             <image class="logo" src="/static/logo.png" mode="aspectFit" />
-            <view class="title">叁生禧员工端</view>
+            <view class="title">徐州大胆恋爱员工端</view>
             <view class="subtitle">仅限内部人员使用</view>
         </view>
 
         <view class="btn-wrapper">
             <button type="primary" open-type="getPhoneNumber" @getphonenumber="login" :loading="loading"
                 :disabled="loading">
-                微信授权登录
+                手机号快捷登录
             </button>
         </view>
     </view>

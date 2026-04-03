@@ -13,6 +13,8 @@ interface EmployeeInfo {
   id: number;
   mobile: string;
   nickname: string;
+  avatarPath: string | null;
+  isSuper: boolean;
 }
 
 export const useEmployeeStore = defineStore("employee", () => {
@@ -48,6 +50,8 @@ export const useEmployeeStore = defineStore("employee", () => {
       id: res.id,
       mobile: res.mobile,
       nickname: res.nickname,
+      avatarPath: res.avatar?.length ? res.avatar[0].path : null,
+      isSuper: !!res.is_super,
     };
     return res;
   }
