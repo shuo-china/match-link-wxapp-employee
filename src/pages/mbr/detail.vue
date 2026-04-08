@@ -9,15 +9,16 @@
                         <uni-list-item title="手机号" :rightText="data.mobile" />
                         <uni-list-item title="年龄" :rightText="data.age + '岁  ' + ' / ' + data.birthYear + '年'" />
                         <uni-list-item title="身高" :rightText="data.height + 'cm'" />
+                        <uni-list-item title="体重" :rightText="data.weight ? data.weight + '斤' : '-'" />
                         <uni-list-item title="学历" :rightText="data.education_text" />
                         <uni-list-item title="行业" :rightText="data.industry_text" />
                         <uni-list-item title="职业" :rightText="data.occupation" />
+                        <uni-list-item title="会员等级" :rightText="data.vip_level_text" />
                         <uni-list-item title="相册">
                             <template #footer>
                                 <pro-upload v-model="data.albums" :disabled="true" />
                             </template>
                         </uni-list-item>
-                        <uni-list-item title="会员等级" :rightText="data.vip_level_text" />
                     </uni-list>
                 </uni-card>
             </uni-section>

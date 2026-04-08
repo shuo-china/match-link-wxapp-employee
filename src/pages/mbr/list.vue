@@ -65,8 +65,19 @@
                         </uni-forms-item>
                     </uni-col>
                     <uni-col :span="12">
+                        <uni-forms-item label="性别" name="gender">
+                            <uni-data-select v-model="searchFormData.gender" :localdata="dict?.gender" />
+                        </uni-forms-item>
+                    </uni-col>
+                    <uni-col :span="12">
                         <uni-forms-item label="学历" name="education">
                             <uni-data-select v-model="searchFormData.education" :localdata="dict?.education"
+                                :multiple="true" />
+                        </uni-forms-item>
+                    </uni-col>
+                    <uni-col :span="12">
+                        <uni-forms-item label="行业" name="industry">
+                            <uni-data-select v-model="searchFormData.industry" :localdata="dict?.industry"
                                 :multiple="true" />
                         </uni-forms-item>
                     </uni-col>
@@ -74,6 +85,26 @@
                         <uni-forms-item label="婚姻" name="marital_status">
                             <uni-data-select v-model="searchFormData.maritalStatus" :localdata="dict?.marital_status"
                                 :multiple="true" />
+                        </uni-forms-item>
+                    </uni-col>
+                    <uni-col :span="12">
+                        <uni-forms-item label="是否有房" name="hasHouse">
+                            <uni-data-select v-model="searchFormData.hasHouse" :localdata="whetherOptions" />
+                        </uni-forms-item>
+                    </uni-col>
+                    <uni-col :span="12">
+                        <uni-forms-item label="是否有车" name="hasVehicle">
+                            <uni-data-select v-model="searchFormData.hasVehicle" :localdata="whetherOptions" />
+                        </uni-forms-item>
+                    </uni-col>
+                    <uni-col :span="12">
+                        <uni-forms-item label="有无孩子" name="hasChildren">
+                            <uni-data-select v-model="searchFormData.hasChildren" :localdata="whetherOptions" />
+                        </uni-forms-item>
+                    </uni-col>
+                    <uni-col :span="12">
+                        <uni-forms-item label="会员等级" name="vip_level">
+                            <uni-data-select v-model="searchFormData.vipLevel" :localdata="dict?.vip_level" />
                         </uni-forms-item>
                     </uni-col>
                     <uni-col :span="24">
@@ -98,12 +129,21 @@
 import { ref } from 'vue';
 import { deleteMbrApi, getMbrPaginationApi } from '@/api/mbr';
 import useDict from '@/hooks/useDict';
+import { whetherOptions } from '@/utils/options';
 
-const { dict } = useDict(['education', 'marital_status'])
+const { dict } = useDict(['education', 'marital_status', 'gender', 'industry', 'vip_level'])
 
 const swipeActionRef = ref()
 
 const rightOptions = [
+    {
+        action: 'track',
+        text: ' 追踪',
+        style: {
+            color: '#fff',
+            backgroundColor: '#f3a73f'
+        }
+    },
     {
         action: 'edit',
         text: '编辑',
@@ -124,6 +164,14 @@ const rightOptions = [
 
 const handleClickActionItem = (e, item) => {
     switch (e.content.action) {
+        case 'track':
+            uni.navigateTo({
+                url: '/pages/track/list?memberId=' + item.id
+            }).then(() => {
+                swipeActionRef.value?.closeAll()
+            })
+            break;
+
         case 'edit':
             uni.navigateTo({
                 url: '/pages/mbr/form?id=' + item.id,
@@ -164,10 +212,16 @@ const searchFormVisible = ref(false)
 const getInitialSearchFormData = () => ({
     name: '',
     mobile: '',
+    vipLevel: '',
+    industry: [],
+    gender: '',
     age: [null, null],
     height: [null, null],
     education: [],
-    maritalStatus: []
+    maritalStatus: [],
+    hasHouse: '',
+    hasVehicle: '',
+    hasChildren: '',
 })
 const searchFormData = ref(getInitialSearchFormData())
 
@@ -336,5 +390,9 @@ const handleTapItem = (item) => {
             display: inline-block;
         }
     }
+}
+
+:deep(.uni-forms-item) {
+    margin-bottom: 12px;
 }
 </style>

@@ -18,6 +18,9 @@
                 <uni-forms-item label="身高" name="height" required>
                     <pro-picker mode="selector" v-model="formData.height" :options="heightOptions" init-value="170" />
                 </uni-forms-item>
+                <uni-forms-item label="体重" name="height">
+                    <pro-picker mode="selector" v-model="formData.weight" :options="weightOptions" init-value="120" />
+                </uni-forms-item>
                 <uni-forms-item label="学历" name="education" required>
                     <pro-picker mode="selector" v-model="formData.education" :options="dict?.education"
                         init-value="3" />
@@ -28,11 +31,11 @@
                 <uni-forms-item label="职业" name="occupation">
                     <uni-easyinput type="text" v-model="formData.occupation" />
                 </uni-forms-item>
-                <uni-forms-item label="相册" name="albums">
-                    <pro-upload v-model="formData.albums" />
-                </uni-forms-item>
                 <uni-forms-item label="会员等级" name="vipLevel" required>
                     <pro-picker mode="selector" v-model="formData.vipLevel" :options="dict?.vip_level" />
+                </uni-forms-item>
+                <uni-forms-item label="相册" name="albums">
+                    <pro-upload v-model="formData.albums" />
                 </uni-forms-item>
             </uni-card>
 
@@ -109,7 +112,7 @@
 import { computed, getCurrentInstance, ref, watch } from 'vue';
 import { onLoad, onReady } from '@dcloudio/uni-app';
 import useDict from '@/hooks/useDict';
-import { birthYearOptions, childCustodyOptions, childGenderOptions, heightOptions, whetherOptions } from '@/utils/options';
+import { birthYearOptions, childCustodyOptions, childGenderOptions, heightOptions, weightOptions, whetherOptions } from '@/utils/options';
 import { createMbrApi, getMbrDetailApi, updateMbrApi } from '@/api/mbr';
 
 interface Child {
@@ -124,6 +127,7 @@ const formData = ref({
     mobile: '',
     birthYear: '',
     height: '',
+    weight: '',
     education: '',
     industry: '',
     vipLevel: '',

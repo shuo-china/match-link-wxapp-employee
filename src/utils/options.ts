@@ -23,6 +23,17 @@ export const heightOptions = (() => {
   return options;
 })();
 
+export const weightOptions = (() => {
+  const options = [] as OptionItem[];
+  for (let i = 60; i <= 300; i += 1) {
+    options.push({
+      text: `${i}斤`,
+      value: `${i}`,
+    });
+  }
+  return options;
+})();
+
 export const birthYearOptions = (() => {
   const options = [] as OptionItem[];
   const currentYear = new Date().getFullYear();

@@ -16,7 +16,9 @@
 
         <view class="list-container">
             <uni-swipe-action ref="swipeActionRef">
-                <pro-pagination ref="listRef" :request="getTrackPaginationApi" v-slot="{ data }">
+                <pro-pagination ref="listRef" :request="getTrackPaginationApi" :requestOptions="{
+                    manual: true
+                }" v-slot="{ data }">
                     <view class="record-item" v-for="item in data" :key="item.id">
                         <uni-swipe-action-item :rightOptions="rightOptions"
                             @click="e => handleClickActionItem(e, item)">
@@ -63,10 +65,15 @@
             </uni-swipe-action>
         </view>
 
-        <pro-search-form v-model:visible="searchFormVisible" @reset="handleReset"
-            @search="() => listRef.search(searchFormData)">
+        <pro-search-form v-model:visible="searchFormVisible" @reset="handleReset" @search="handleSearch">
             <uni-forms label-position="top">
                 <uni-row :gutter="36">
+                    <uni-col :span="24">
+                        <uni-forms-item label="付费意向" name="intention">
+                            <uni-data-select v-model="searchFormData.intention" :localdata="dict?.purchase_intention"
+                                :multiple="true" />
+                        </uni-forms-item>
+                    </uni-col>
                     <uni-col :span="12">
                         <uni-forms-item label="会员姓名" name="name">
                             <uni-easyinput v-model="searchFormData.name" type="text" placeholder="请输入会员姓名" />
@@ -77,12 +84,6 @@
                             <uni-easyinput v-model="searchFormData.mobile" type="text" placeholder="请输入会员手机号" />
                         </uni-forms-item>
                     </uni-col>
-                    <uni-col :span="24">
-                        <uni-forms-item label="付费意向" name="intention">
-                            <uni-data-select v-model="searchFormData.intention" :localdata="dict?.purchase_intention"
-                                :multiple="true" />
-                        </uni-forms-item>
-                    </uni-col>
                 </uni-row>
             </uni-forms>
         </pro-search-form>
@@ -90,9 +91,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { deleteTrackApi, getTrackPaginationApi } from '@/api/track';
 import useDict from '@/hooks/useDict';
+import { onLoad } from '@dcloudio/uni-app';
 const { dict } = useDict(['purchase_intention'])
 
 const swipeActionRef = ref()
@@ -152,9 +154,16 @@ const handleTapItem = (item) => {
     })
 }
 
+const handleSearch = () => {
+    listRef.value?.search({
+        member_id: memberId,
+        ...searchFormData.value
+    })
+}
+
 const handleReset = () => {
     searchFormData.value = getInitialSearchFormData()
-    listRef.value?.search(searchFormData.value)
+    handleSearch()
 }
 
 const handleClickActionItem = (e, item) => {
@@ -192,6 +201,17 @@ const handleClickActionItem = (e, item) => {
             break;
     }
 }
+
+let memberId
+onLoad((options) => {
+    if (options?.memberId) {
+        memberId = options.memberId
+    }
+})
+
+onMounted(() => {
+    handleSearch()
+})
 </script>
 
 <style lang="scss" scoped>

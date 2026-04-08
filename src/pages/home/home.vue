@@ -5,17 +5,13 @@
       <view class="hero-card">
         <view class="user-profile">
           <view class="avatar-box">
-            <image
-              v-if="employeeInfo?.avatarPath"
-              class="avatar-image"
-              :src="employeeInfo.avatarPath"
-              mode="aspectFill"
-            />
+            <image v-if="employeeInfo?.avatarPath" class="avatar-image" :src="employeeInfo.avatarPath"
+              mode="aspectFill" />
             <uni-icons v-else type="person-filled" size="40" color="#8B5A2B"></uni-icons>
           </view>
           <view class="user-info">
             <view class="greeting">{{ employeeInfo?.nickname }}</view>
-            <view class="role-tag">红娘顾问</view>
+            <view class="role-tag">{{ employeeInfo?.mobile }}</view>
           </view>
         </view>
         <view class="decoration-circle"></view>
@@ -147,8 +143,8 @@ const handleTapFnItem = (item) => {
   }
 
   .avatar-box {
-    width: 56px;
-    height: 56px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     background-color: #ffffff;
     display: flex;
@@ -174,7 +170,7 @@ const handleTapFnItem = (item) => {
     font-size: 20px;
     font-weight: bold;
     color: #ffffff;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     letter-spacing: 1px;
   }
 
