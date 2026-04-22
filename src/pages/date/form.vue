@@ -124,4 +124,12 @@ onLoad((options) => {
         padding-bottom: 16px;
     }
 }
+
+:deep(.uni-card) {
+    overflow: visible !important;
+}
+
+:deep(.uni-card__content) {
+    overflow: visible !important;
+}
 </style>
